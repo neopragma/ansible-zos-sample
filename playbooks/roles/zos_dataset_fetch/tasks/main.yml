@@ -1,0 +1,30 @@
+---
+- name: Validate inputs
+  assert:
+    that:
+      - dataset_name | length > 0
+      - local_file | length > 0
+
+- name: Ensure local directory exists
+  ansible.builtin.file:
+    path: "{{ local_dir }}"
+    state: directory
+  delegate_to: 127.0.0.1
+
+- name: Run command on USS command line 
+  ansible.builtin.command: 
+    cmd: echo ok
+
+
+- debug:
+    msg:
+      - "dataset_name={{ dataset_name }}"
+
+- name: Fetch dataset from z/OS
+  ibm.ibm_zos_core.zos_fetch:
+    src: "{{ dataset_name }}"
+    dest: "./{{ local_dir }}/{{ local_file }}"
+    is_binary: false
+    encoding:
+      from: IBM-1047
+      to: UTF-8

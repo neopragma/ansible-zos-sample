@@ -1,0 +1,25 @@
+---
+#------------------------------------------------------------
+# Demonstrates the use of ibm.ibm_zos_core.zos_gather_facts
+# to collect information about the Master Catalog.
+#------------------------------------------------------------
+- name: Get Master Catalog information from z/OS nodes     
+  hosts: zoslab
+  gather_facts: false 
+  collections:
+    - ibm.ibm_zos_core
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: Gather master catalog info from 'ipl' subset 
+      zos_gather_facts:
+        gather_subset:
+          - 'ipl'
+          - 'cpu'
+          - 'iodf'
+        filter:
+          - 'master*'
+           
+    - name: Print out all collected info 
+      debug:
+        var: ansible_facts        

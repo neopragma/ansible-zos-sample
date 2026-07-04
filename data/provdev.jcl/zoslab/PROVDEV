@@ -1,0 +1,82 @@
+//IBMUSERP JOB ,'PROVISION DEV LIBS',
+//            CLASS=A,MSGCLASS=X,MSGLEVEL=(1,1),
+//            NOTIFY=&SYSUID
+//         JCLLIB ORDER=(&SYSUID..LAB.PROCLIB)
+// EXPORT SYMLIST=(HLQ)
+// SET HLQ=IBMUSER
+//********************************************************************
+//* SAMPLE JOB THAT ALLOCATES LIBRARIES FOR HYPOTHETICAL DEVELOPER
+//********************************************************************
+//DEVJCL   EXEC MAKELIB,LIBNAME=&HLQ..DEV.JCL,PRI=2,SEC=2
+//TSTJCL   EXEC MAKELIB,LIBNAME=&HLQ..TST.JCL
+//DEVPROC  EXEC MAKELIB,LIBNAME=&HLQ..DEV.PROCLIB
+//TSTPROC  EXEC MAKELIB,LIBNAME=&HLQ..TST.PROCLIB
+//********************************************************************
+//* SEED DEV JCL SOURCE LIBRARY WITH DEFAULT MEMBERS
+//********************************************************************
+//SEEDJCL   EXEC PGM=IEBCOPY,COND=(0,GT)
+//SYSPRINT  DD SYSOUT=*
+//SYSOUT    DD SYSOUT=*
+//JCLSEED   DD DSN=&HLQ..LAB.SEED.JCL,DISP=SHR
+//JCLOUT    DD DSN=&HLQ..DEV.JCL,DISP=SHR
+//PROCOUT   DD DSN=&HLQ..DEV.PROCLIB,DISP=SHR
+//SYSIN     DD *
+COPYOPER COPY OUTDD=JCLOUT,INDD=JCLSEED
+         SELECT MEMBER=(ASM,HELLO)
+COPYOPER COPY OUTDD=PROCOUT,INDD=JCLSEED
+         SELECT MEMBER=(ASMBIND)
+/*
+//*
+//********************************************************************
+//* ALLOCATE SOURCE LIBRARIES FOR ASSEMBLER SOURCE AND MACROS
+//********************************************************************
+//IBMUSER2 JOB ,'ALLOC ASSEMBLER LIBS',
+//            CLASS=A,MSGCLASS=X,MSGLEVEL=(1,1),
+//            NOTIFY=&HLQ
+//         JCLLIB ORDER=(&HLQ..LAB.PROCLIB)
+//DEVASM   EXEC MAKELIB,LIBNAME=&HLQ..DEV.ASM,PRI=20,SEC=4
+//DEVMAC   EXEC MAKELIB,LIBNAME=&HLQ..DEV.MACLIB,PRI=8,SEC=4
+//TSTASM   EXEC MAKELIB,LIBNAME=&HLQ..TST.ASM,PRI=20,SEC=4
+//TSTMAC   EXEC MAKELIB,LIBNAME=&HLQ..TST.MACLIB,PRI=8,SEC=4
+//SNIPASM  EXEC MAKELIB,LIBNAME=&HLQ..SNIPPETS.ASM
+//********************************************************************
+//* SEED DEV ASSEMBLER SOURCE LIBRARIES WITH SAMPLE MEMBERS
+//********************************************************************
+//SEEDJCL   EXEC PGM=IEBCOPY,COND=(0,GT)
+//SYSPRINT  DD SYSOUT=*
+//SYSOUT    DD SYSOUT=*
+//ASMSEED   DD DSN=&HLQ..LAB.SEED.ASM,DISP=SHR
+//ASMOUT    DD DSN=&HLQ..DEV.ASM,DISP=SHR
+//SYSIN     DD *
+COPYOPER COPY OUTDD=ASMOUT,INDD=ASMSEED
+         SELECT MEMBER=HELLO
+/*
+//*
+//********************************************************************
+//* ALLOCATE SOURCE LIBRARIES FOR REXX SCRIPTS
+//********************************************************************
+//IBMUSER3 JOB ,'ALLOC REXX LIBS',
+//            CLASS=A,MSGCLASS=X,MSGLEVEL=(1,1),
+//            NOTIFY=&HLQ
+//         JCLLIB ORDER=(&HLQ..LAB.PROCLIB)
+//DEVREXX  EXEC MAKELIB,LIBNAME=&HLQ..DEV.REXX,PRI=2,SEC=4
+//TSTREXX  EXEC MAKELIB,LIBNAME=&HLQ..TST.REXX,PRI=2,SEC=4
+//*
+//********************************************************************
+//* ALLOCATE SOURCE LIBRARIES FOR COBOL SOURCE AND COPYBOOKS
+//********************************************************************
+//DEVCOB   EXEC MAKELIB,LIBNAME=&HLQ..DEV.COBOL,PRI=20,SEC=4
+//DEVCPY   EXEC MAKELIB,LIBNAME=&HLQ..DEV.COPYLIB,PRI=8,SEC=4
+//TSTCOB   EXEC MAKELIB,LIBNAME=&HLQ..TST.COBOL,PRI=20,SEC=4
+//TSTCPY   EXEC MAKELIB,LIBNAME=&HLQ..TST.COPYLIB,PRI=8,SEC=4
+//SNIPCOB  EXEC MAKELIB,LIBNAME=&HLQ..SNIPPETS.COBOL
+//*
+//********************************************************************
+//* ALLOCATE PROGRAM LIBRARIES FOR AN APPLICATION DEVELOPER
+//********************************************************************
+//IBMUSER4 JOB ,'ALLOC PROGRAM LIBS',
+//            CLASS=A,MSGCLASS=X,MSGLEVEL=(1,1),
+//            NOTIFY=&HLQ
+//         JCLLIB ORDER=(&HLQ..LAB.PROCLIB)
+//DEVPLIB  EXEC MAKEPLIB,LIBNAME=&HLQ..DEV.PROGLIB,PRI=10,SEC=4
+//TSTPLIB  EXEC MAKEPLIB,LIBNAME=&HLQ..TST.PROGLIB,PRI=3,SEC=2

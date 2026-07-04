@@ -1,0 +1,45 @@
+---
+- name: Submit JCL and fetch output
+  hosts: zoslab
+  gather_facts: false
+
+  environment: "{{ environment_vars }}"
+
+  collections:
+    - ibm.ibm_zos_core
+
+  tasks:
+
+    - name: Verify required variables were provided
+      ansible.builtin.assert:
+        that:
+          - zos_jcl_source | default('') | length > 0
+        fail_msg: >
+          Required variable is missing.
+          Specify it with, for example:
+          -e "zos_jcl_source=USER.JCLLIB(MEMBER)"
+
+    - name: Submit JCL member
+      zos_job_submit:
+        src: "{{ zos_jcl_source }}"
+        location: DATA_SET
+        wait_time_s: 60
+        return_output: true
+      register: job_result
+
+    - name: Extract JOB ID
+      set_fact:
+        job_id: "{{ job_result.jobs[0].job_id }}"
+
+    - name: Display JOB ID
+      debug:
+        msg: "Submitted job ID is {{ job_id }}"
+
+    - name: Fetch job output (spool)
+      zos_job_output:
+        job_id: "{{ job_id }}"
+      register: spool_output
+
+    - name: Print spool output
+      debug:
+        var: spool_output

@@ -1,0 +1,9 @@
+- name: Submit JCL
+  ibm.ibm_zos_core.zos_job_submit:
+    src: "{{ src }}"
+  register: job_output
+
+- name: Validate return code
+  assert:
+    that:
+      - job_output.jobs[0].ret_code.code <= acceptable_cond_code

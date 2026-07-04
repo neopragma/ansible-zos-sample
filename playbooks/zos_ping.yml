@@ -1,0 +1,14 @@
+---
+- name: Ping z/OS node
+  hosts: zos
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: Pinging host
+      ping: {}
+      register: result
+      
+    - name: Response
+      debug:
+        msg: "{{ result.ping }}"

@@ -1,0 +1,46 @@
+#------------------------------------------------------------
+# Demonstrates how to set up a playbook as an orchestrator
+# to invoke one or more roles repeatedly to carry out a
+# series of similar operations. 
+#  
+# In this case, the operation is to delete and (re)allocate
+# z/OS source libraries such as an application developer
+# would normally use in their work, such as:
+#  
+# USER55.DEV.COBOL
+# USER55.TST.COBOL
+# USER55.DEV.JCL
+# USER55.TST.JCL
+#  
+#------------------------------------------------------------
+   
+- name: Submit resolved JCL to z/OS
+  hosts: zoslab
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  vars:
+    job_owner: "{{ owner | default(IBMUSER) }}" 
+    hlq: "{{ userid }}"
+    jcl_path: "{{ playbook_dir }}/tmp_jcl/rendered.jcl"
+    jcl_dataset_name: "{{ job_owner }}.TMPJCL.{{ inventory_hostname | upper }}"
+
+    libraries:
+      - mlq: DEV
+        libname: JCL
+        primary_allocation: 2
+        secondary_allocation: 4
+
+  tasks:
+
+    - ansible.builtin.assert:
+        that: hlq is defined
+        fail_msg: 'The z/OS userid must be passed on command line: ansible-playbook blah -e "userid"'
+
+    - name: Submit one job per library
+      ansible.builtin.include_role:
+        name: submit_library_provisioning_job
+      vars:
+        library: "{{ item }}"
+      loop: "{{ libraries }}"
+      loop_control:
+        label: "{{ hlq }}.{{ item.mlq }}.{{ item.libname }}"

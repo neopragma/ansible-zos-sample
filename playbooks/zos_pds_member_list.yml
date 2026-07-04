@@ -1,0 +1,30 @@
+---
+#------------------------------------------------------------ 
+# Demonstrates how to issue a TSO command through Ansible.
+# This example does a LISTDS to get a list of members in
+# the Partitioned Data Set named in command line argument
+#
+# -e "pds=ZOS.DATASET.NAME"
+#
+# It also demonstrates how to handle the yaml+TSO quotes and
+# apostrophes when the name of the PDS is passed in as a
+# variable.
+#------------------------------------------------------------ 
+- name: List members in SYS1.PROCLIB
+  hosts: zoslab
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  environment: "{{ environment_vars }}"
+
+  tasks:
+
+    - name: List members in "{{ pds }}"
+      zos_tso_command:
+        commands:
+          - "LISTDS '{{ pds }}' MEMBERS"
+      register: result
+
+    - name: Display result
+      debug:
+        msg: "{{ result }}"

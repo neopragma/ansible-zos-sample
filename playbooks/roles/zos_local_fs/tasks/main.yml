@@ -1,0 +1,4 @@
+- name: Ensure directory exists
+  file:
+    path: "{{ dirname }}"
+    state: directory

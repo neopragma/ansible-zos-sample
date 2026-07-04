@@ -1,0 +1,49 @@
+---
+#------------------------------------------------------------
+# Demonstrates the use of ibm.ibm_zos_core.zos_job_query to
+# list all the active started tasks on z/OS hosts.
+#  
+# Recent versions of Ansible support a simpler way to do 
+# this than it offered originally, but many installations
+# are still using older versions. This playbook shows both
+# ways of doing it.
+#------------------------------------------------------------  
+- name: List active started tasks
+  hosts: zoslab
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  environment: "{{ environment_vars }}"
+
+    # Standard way
+    # If job_class is not supported for zos_job_query in your version
+    # of ibm_zos_core, try the workaround below
+
+  tasks:
+    #    - name: List started tasks
+    #      zos_job_query:
+    #        job_class: STC
+    #      register: result
+
+    #    - name: Display result
+    #        var: "{{ result.jobs }}"
+    # Workaround for older versions of ibm_zos_core
+
+    - name: Query all active jobs
+      zos_job_query:
+      register: active_jobs
+
+    - name: Keep only started tasks
+      set_fact:
+        started_tasks: >-
+          {{
+            active_jobs.jobs
+            | selectattr('job_class', 'defined')
+            | selectattr('job_class', 'equalto', 'STC')
+            | list
+          }}
+
+    - name: Display result
+      debug:
+        msg: "{{ started_tasks | map(attribute='job_name') | list }}" 
+        #var: started_tasks    

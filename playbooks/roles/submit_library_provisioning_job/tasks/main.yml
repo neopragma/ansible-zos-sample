@@ -1,0 +1,63 @@
+#------------------------------------------------------------
+# Demonstrates how to set up a playbook as an orchestrator
+# to invoke one or more roles repeatedly to carry out a
+# series of similar operations. 
+#  
+# In this case, the operation is to delete and (re)allocate
+# z/OS source libraries such as an application developer
+# would normally use in their work, such as:
+#  
+# USER55.DEV.COBOL
+# USER55.TST.COBOL
+# USER55.DEV.JCL
+# USER55.TST.JCL
+#  
+#------------------------------------------------------------
+
+- name: Set temporary JCL paths
+  ansible.builtin.set_fact:
+    jcl_path: "{{ playbook_dir }}/tmp_jcl/rendered.jcl"
+    jcl_dataset_name: "{{ job_owner }}.TEMP.JCL"
+
+- name: Render JCL on the control node
+  ansible.builtin.template:
+    src: provdev.jcl.j2
+    dest: "{{ jcl_path }}"
+  delegate_to: localhost
+
+- name: Delete temporary JCL dataset
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ jcl_dataset_name }}"
+    state: absent
+
+- name: Allocate temporary JCL dataset
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ jcl_dataset_name }}"
+    state: present
+    type: seq
+    record_format: fb
+    record_length: 80
+    block_size: 0
+    space_primary: 5
+    space_secondary: 1
+    space_type: trk
+
+- name: Copy rendered JCL to temporary dataset
+  ibm.ibm_zos_core.zos_copy:
+    src: "{{ jcl_path }}"
+    dest: "{{ jcl_dataset_name }}"
+    remote_src: false
+
+- name: Submit JCL
+  ibm.ibm_zos_core.zos_job_submit:
+    src: "{{ jcl_dataset_name }}"
+    wait_time_s: 30
+  register: job_result
+
+- name: Display submitted job
+  ansible.builtin.debug:
+    msg:
+      - "Library: {{ hlq }}.{{ library.mlq }}.{{ library.libname }}"
+      - "Job ID : {{ job_result.jobs[0].job_id }}"
+
+

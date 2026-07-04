@@ -1,0 +1,88 @@
+#------------------------------------------------------------
+# Demonstrates how to submit JCL stored on localhost to a 
+# z/OS host.
+#
+# Demonstrates how to use a jinja2 template for the JCL, and
+# provide values for variables in the template to complete
+# the JCL statements. 
+#
+# The job in this case deletes and (re)allocates a library
+# under a given high-level qualifier. The job may be owned
+# by a different TSO id than the high-level qualifier.
+#
+# The library is assumed to be a source library used by an
+# application developer, so it will have a mid-level 
+# qualifier of either DEV or TST. The low-level qualifier
+# will be suggestive of the use of the library, such as
+# COBOL, REXX, JCL, or PROCLIB.
+#
+# Examples:
+#
+# DSN=USER55.DEV.COBOL
+#
+# Variables:
+#
+# job_owner: The TSO id of the job's owner.
+# hlq: The high-level qualifier for the library.
+# mlq: The mid-level qualifier for the library.
+# libname: The low-level qualifier for the library.
+#------------------------------------------------------------ 
+- name: Submit resolved JCL to z/OS
+  hosts: zoslab
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  vars:
+    job_owner: IBMUSER
+    hlq: PLAT01
+    mlq: DEV
+    libname: JCL 
+    primary_allocation: 2
+    secondary_allocation: 4 
+    jcl_path: "{{ playbook_dir }}/tmp_jcl/rendered.jcl"
+    jcl_dataset_name: "{{ job_owner }}.TEMP.JCL"
+
+  tasks:
+    - name: Render JCL locally on control node
+      ansible.builtin.template:
+        src: templates/provdev.jcl.j2
+        dest: "{{ jcl_path }}"
+      delegate_to: localhost
+
+    - name: Show rendered JCL
+      ansible.builtin.command:
+        cmd: cat "{{ jcl_path }}"
+      delegate_to: localhost
+      changed_when: false
+
+    - name: Delete temporary JCL dataset if it exists      
+      ibm.ibm_zos_core.zos_data_set:
+        name: "{{ jcl_dataset_name }}"
+        state: absent
+
+    - name: Allocate temporary JCL dataset
+      ibm.ibm_zos_core.zos_data_set:
+        name: "{{ jcl_dataset_name }}"
+        state: present
+        type: seq
+        record_format: fb
+        record_length: 80
+        block_size: 3120
+        space_primary: 5
+        space_secondary: 1
+        space_type: trk
+
+    - name: Copy JCL into dataset (no USS)
+      ibm.ibm_zos_core.zos_copy:
+        src: "{{ jcl_path }}"
+        dest: "{{ jcl_dataset_name }}"
+        remote_src: false
+
+    - name: Submit JCL from dataset
+      ibm.ibm_zos_core.zos_job_submit:
+        src: "{{ jcl_dataset_name }}"
+      register: job_result
+
+
+    - name: Show job id
+      ansible.builtin.debug:
+        msg: "{{ job_result.jobs[0].job_id }}"

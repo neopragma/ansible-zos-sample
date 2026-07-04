@@ -1,0 +1,59 @@
+#------------------------------------------------------------
+# Purpose
+#
+# Copy a z/OS (MVS) dataset to localhost.
+#
+# Demonstrates
+#
+# 1. The use of ibm.ibm_zos_core.zos_dataset_fetch to copy an 
+#    MVS data set to a local file. 
+#
+# 2. The use of user-defined environment variables and "-e" 
+#    command-line arguments.
+#
+# 3. The use of ansible.builtin.assert to check for required 
+# externally-provided values, in this case the z/OS dataset 
+# name and local filename for the copy.
+#
+# 4. The use of include_role to bring in a Role so that 
+# variable expansion and other Ansible preliminary steps 
+# happen in the right order.
+#
+# This depends on a user-defined local environment variable
+# (not specific to Ansible) named FILE_XFER_DIR to identify
+# the target location on the local system for the file.
+# It has to be defined somewhere under inventory/group_vars
+# so Ansible can find it at runtime.
+#  
+# Pass the z/OS dataset name and the local filename as
+# command-line arguments when invoking ansible-playbook. 
+# The file will land in FILE_XFER_DIR/local_filename.
+#
+#   -e "zos_dataset_name=IBMUSER.LAB.JCL(PROVDEV)" 
+#   -e "local_filename=provdev.jcl"
+#------------------------------------------------------------ 
+- name: Fetch dataset from z/OS
+  hosts: zoslab
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: Verify required variables were provided
+      ansible.builtin.assert:
+        that:
+          - zos_dataset_name | default('') | length > 0
+          - local_filename | default('') | length > 0
+        fail_msg: >
+          Required variables are missing.
+          Specify them with, for example:
+          -e "zos_dataset_name=USER.TEST.DATA local_filename=/tmp/test.txt"
+
+    - name: Fetch dataset
+      ansible.builtin.include_role:
+        name: zos_dataset_fetch
+      vars:
+        dataset_name: "{{ zos_dataset_name }}"
+        local_dir: "{{ FILE_XFER_DIR }}"
+        local_file: "{{ local_filename }}"

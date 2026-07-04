@@ -1,0 +1,88 @@
+---
+#------------------------------------------------------------
+# Purpose
+# 
+# Copy default members for developer source libraries to a
+# z/OS managed node.
+#
+# Usage
+#
+# ansible-playbook [dir]/zos_seed_libraries.yml
+#   -e "userid=TSOUSER"    will be HLQ for the libraries
+#
+# Demonstrates
+#
+# 1. Checking for a required command-line argument and
+#    displaying a helpful message when it is missing.
+#
+# 2. A workaround for earlier versions of ibm_zos_core that
+#    don't fully initialize the connection until you hit
+#    the managed node with a command.
+#     
+# 3. How to use Roles in a playbook.
+#
+# 4. How to process nested loops in playbooks and Roles.
+#  
+# 5. How to write a data-driven automation playbook based on
+#    a specific directory structure and file naming convention.
+#
+# Uses
+#
+# roles/zos_seed_library/tasks/main.yml 
+# roles/zos_seed_library/tasks/copy_member.yml
+# seed_files/*
+#------------------------------------------------------------          
+- name: Seed z/OS libraries
+  hosts: zoslab
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  vars:
+    hlq: "{{ userid }}"
+    mlq: DEV
+    seed_base: "{{ playbook_dir }}/seed_files"
+
+  tasks:
+
+    - name: Verify userid supplied
+      ansible.builtin.assert:
+        that:
+          - userid is defined
+          - userid | length > 0
+        fail_msg: >
+          Specify the userid:
+          ansible-playbook zos_seed_libraries.yml
+          -e "userid=IBMUSER"
+
+    - name: Show target
+      ansible.builtin.debug:
+        msg: "Seeding {{ hlq }}.{{ mlq }}.*"
+
+    #
+    # Required workaround for ibm_zos_core 1.9.3
+    #
+    - name: Warm up remote session
+      ansible.builtin.command: /bin/true
+      changed_when: false
+
+    - name: Discover library directories
+      ansible.builtin.find:
+        paths: "{{ seed_base }}"
+        recurse: false
+        file_type: directory
+      delegate_to: localhost
+      register: library_dirs
+
+# debug
+    - name: Show discovered libraries
+      ansible.builtin.debug:
+        msg: "{{ item.path }}"
+      loop: "{{ library_dirs.files }}"      
+# end debug
+
+    - name: Seed each library
+      ansible.builtin.include_role:
+        name: zos_seed_library
+      vars:
+        library: "{{ item.path | basename }}"
+      loop: "{{ library_dirs.files }}"
