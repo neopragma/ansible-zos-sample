@@ -103,78 +103,78 @@ Demonstrates how to submit inline JCL in a playbook.
 
 ## Directory tree
 .
-├── README.md
-├── ansible.cfg
-├── data
-│   ├── provdev.jcl
-│   │   └── zoslab
-│   │       └── PROVDEV
-│   └── tmp
-│       └── zoslab
-│           └── JOB
-├── id\_rsa
-├── id\_rsa.pub
-├── inventory
-│   ├── group\_vars
-│   │   └── all
-│   │       ├── all.yml
-│   │       └── vault.yml
-│   ├── host\_vars
-│   │   └── zoslab.yml
-│   └── hosts.yml
-├── play
-├── playbooks
-│   ├── roles
-│   │   ├── submit\_library\_provisioning\_job
-│   │   │   └── tasks
-│   │   │       └── main.yml
-│   │   ├── zos\_dataset\_fetch
-│   │   │   └── tasks
-│   │   │       └── main.yml
-│   │   ├── zos\_job\_run
-│   │   │   └── tasks
-│   │   │       └── main.yml
-│   │   ├── zos\_local\_fs
-│   │   │   └── tasks
-│   │   │       └── main.yml
-│   │   └── zos\_seed\_library
-│   │       └── tasks
-│   │           ├── copy\_members.yml
-│   │           └── main.yml
-│   ├── seed\_files
-│   │   ├── ASM
-│   │   │   └── HELLO
-│   │   ├── COBOL
-│   │   │   ├── BTCHESDS
-│   │   │   ├── BTCHKSDS
-│   │   │   ├── BTCHRRDS
-│   │   │   ├── BTCHSKEL
-│   │   │   ├── CURREPOS
-│   │   │   ├── CURSCROL
-│   │   │   ├── CURUPDAT
-│   │   │   └── DATES
-│   │   ├── JCL
-│   │   │   ├── ASM.jcl
-│   │   │   └── HELLO.jcl
-│   │   ├── PROCLIB
-│   │   │   └── ASMBIND
-│   │   └── REXX
-│   │       ├── DATETIME
-│   │       ├── FACTORIA
-│   │       └── REXLIST
-│   ├── submit\_jcl\_and\_get\_spooler\_output.yml
-│   ├── templates
-│   │   └── provdev.jcl.j2
-│   ├── tmp\_jcl
-│   │   └── rendered.jcl
-│   ├── zos\_active\_started\_tasks.yml
-│   ├── zos\_fetch\_dataset\_from\_host.yml
-│   ├── zos\_master\_catalog\_info.yml
-│   ├── zos\_pds\_member\_list.yml
-│   ├── zos\_ping.yml
-│   ├── zos\_provision\_developer\_libraries.yml
-│   ├── zos\_seed\_libraries.yml
-│   ├── zos\_submit\_jcl\_from\_local.yml
-│   └── zos\_submit\_jcl\_inline.yml
+├── README.md  
+├── ansible.cfg  
+├── data  
+│   ├── provdev.jcl  
+│   │   └── zoslab  
+│   │       └── PROVDEV  
+│   └── tmp  
+│       └── zoslab  
+│           └── JOB  
+├── id\_rsa  
+├── id\_rsa.pub  
+├── inventory  
+│   ├── group\_vars  
+│   │   └── all  
+│   │       ├── all.yml  
+│   │       └── vault.yml  
+│   ├── host\_vars  
+│   │   └── zoslab.yml  
+│   └── hosts.yml  
+├── play  
+├── playbooks  
+│   ├── roles  
+│   │   ├── submit\_library\_provisioning\_job  
+│   │   │   └── tasks  
+│   │   │       └── main.yml  
+│   │   ├── zos\_dataset\_fetch  
+│   │   │   └── tasks  
+│   │   │       └── main.yml  
+│   │   ├── zos\_job\_run  
+│   │   │   └── tasks  
+│   │   │       └── main.yml  
+│   │   ├── zos\_local\_fs  
+│   │   │   └── tasks  
+│   │   │       └── main.yml  
+│   │   └── zos\_seed\_library  
+│   │       └── tasks  
+│   │           ├── copy\_members.yml  
+│   │           └── main.yml  
+│   ├── seed\_files  
+│   │   ├── ASM  
+│   │   │   └── HELLO  
+│   │   ├── COBOL  
+│   │   │   ├── BTCHESDS  
+│   │   │   ├── BTCHKSDS  
+│   │   │   ├── BTCHRRDS  
+│   │   │   ├── BTCHSKEL  
+│   │   │   ├── CURREPOS  
+│   │   │   ├── CURSCROL  
+│   │   │   ├── CURUPDAT  
+│   │   │   └── DATES  
+│   │   ├── JCL  
+│   │   │   ├── ASM.jcl  
+│   │   │   └── HELLO.jcl  
+│   │   ├── PROCLIB  
+│   │   │   └── ASMBIND  
+│   │   └── REXX  
+│   │       ├── DATETIME  
+│   │       ├── FACTORIA  
+│   │       └── REXLIST  
+│   ├── submit\_jcl\_and\_get\_spooler\_output.yml  
+│   ├── templates  
+│   │   └── provdev.jcl.j2  
+│   ├── tmp\_jcl  
+│   │   └── rendered.jcl  
+│   ├── zos\_active\_started\_tasks.yml  
+│   ├── zos\_fetch\_dataset\_from\_host.yml  
+│   ├── zos\_master\_catalog\_info.yml  
+│   ├── zos\_pds\_member\_list.yml  
+│   ├── zos\_ping.yml  
+│   ├── zos\_provision\_developer\_libraries.yml  
+│   ├── zos\_seed\_libraries.yml  
+│   ├── zos\_submit\_jcl\_from\_local.yml  
+│   └── zos\_submit\_jcl\_inline.yml  
 └── tmp
 
