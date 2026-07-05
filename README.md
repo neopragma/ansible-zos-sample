@@ -102,19 +102,19 @@ the JCL statements.
 Demonstrates how to submit inline JCL in a playbook.
 
 ## Directory tree
+
+```shell
 .
-├── README.md  
-├── ansible.cfg  
-├── data  
+├── README.md                       This file.  
+├── ansible.cfg                     Ansible configuration.
+├── data                            Data used in some playbooks.
 │   ├── provdev.jcl  
 │   │   └── zoslab  
 │   │       └── PROVDEV  
 │   └── tmp  
 │       └── zoslab  
 │           └── JOB  
-├── id\_rsa  
-├── id\_rsa.pub  
-├── inventory  
+├── inventory                       ansible.cfg points here for inventory.                                        
 │   ├── group\_vars  
 │   │   └── all  
 │   │       ├── all.yml  
@@ -122,9 +122,9 @@ Demonstrates how to submit inline JCL in a playbook.
 │   ├── host\_vars  
 │   │   └── zoslab.yml  
 │   └── hosts.yml  
-├── play  
-├── playbooks  
-│   ├── roles  
+├── play                             wrapper script for ansible-playbook.
+├── playbooks                        Ansible Playbooks are here.
+│   ├── roles                        Ansible Roles are here.
 │   │   ├── submit\_library\_provisioning\_job  
 │   │   │   └── tasks  
 │   │   │       └── main.yml  
@@ -141,7 +141,7 @@ Demonstrates how to submit inline JCL in a playbook.
 │   │       └── tasks  
 │   │           ├── copy\_members.yml  
 │   │           └── main.yml  
-│   ├── seed\_files  
+│   ├── seed\_files                 Seed files for playbook zos_seed_libraries
 │   │   ├── ASM  
 │   │   │   └── HELLO  
 │   │   ├── COBOL  
@@ -162,8 +162,7 @@ Demonstrates how to submit inline JCL in a playbook.
 │   │       ├── DATETIME  
 │   │       ├── FACTORIA  
 │   │       └── REXLIST  
-│   ├── submit\_jcl\_and\_get\_spooler\_output.yml  
-│   ├── templates  
+│   ├── templates                  JCL templates for z/OS job submission  
 │   │   └── provdev.jcl.j2  
 │   ├── tmp\_jcl  
 │   │   └── rendered.jcl  
@@ -176,5 +175,7 @@ Demonstrates how to submit inline JCL in a playbook.
 │   ├── zos\_seed\_libraries.yml  
 │   ├── zos\_submit\_jcl\_from\_local.yml  
 │   └── zos\_submit\_jcl\_inline.yml  
-└── tmp
+└── tmp                            Used for intermediate step in file transfers.
+```
+
 
