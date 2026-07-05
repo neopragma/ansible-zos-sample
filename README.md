@@ -115,33 +115,33 @@ Demonstrates how to submit inline JCL in a playbook.
 │       └── zoslab  
 │           └── JOB  
 ├── inventory                       ansible.cfg points here for inventory.                                        
-│   ├── group\_vars  
+│   ├── group_vars  
 │   │   └── all  
 │   │       ├── all.yml  
 │   │       └── vault.yml  
-│   ├── host\_vars  
+│   ├── host_vars  
 │   │   └── zoslab.yml  
 │   └── hosts.yml  
 ├── play                             wrapper script for ansible-playbook.
 ├── playbooks                        Ansible Playbooks are here.
 │   ├── roles                        Ansible Roles are here.
-│   │   ├── submit\_library\_provisioning\_job  
+│   │   ├── submit_library_provisioning_job  
 │   │   │   └── tasks  
 │   │   │       └── main.yml  
-│   │   ├── zos\_dataset\_fetch  
+│   │   ├── zos_dataset_fetch  
 │   │   │   └── tasks  
 │   │   │       └── main.yml  
-│   │   ├── zos\_job\_run  
+│   │   ├── zos_job_run  
 │   │   │   └── tasks  
 │   │   │       └── main.yml  
-│   │   ├── zos\_local\_fs  
+│   │   ├── zos_local_fs  
 │   │   │   └── tasks  
 │   │   │       └── main.yml  
-│   │   └── zos\_seed\_library  
+│   │   └── zos_seed_library  
 │   │       └── tasks  
-│   │           ├── copy\_members.yml  
+│   │           ├── copy_members.yml  
 │   │           └── main.yml  
-│   ├── seed\_files                 Seed files for playbook zos_seed_libraries
+│   ├── seed_files                 Seed files for playbook zos_seed_libraries
 │   │   ├── ASM  
 │   │   │   └── HELLO  
 │   │   ├── COBOL  
@@ -164,17 +164,17 @@ Demonstrates how to submit inline JCL in a playbook.
 │   │       └── REXLIST  
 │   ├── templates                  JCL templates for z/OS job submission  
 │   │   └── provdev.jcl.j2  
-│   ├── tmp\_jcl  
+│   ├── tmp_jcl  
 │   │   └── rendered.jcl  
-│   ├── zos\_active\_started\_tasks.yml  
-│   ├── zos\_fetch\_dataset\_from\_host.yml  
-│   ├── zos\_master\_catalog\_info.yml  
-│   ├── zos\_pds\_member\_list.yml  
-│   ├── zos\_ping.yml  
-│   ├── zos\_provision\_developer\_libraries.yml  
-│   ├── zos\_seed\_libraries.yml  
-│   ├── zos\_submit\_jcl\_from\_local.yml  
-│   └── zos\_submit\_jcl\_inline.yml  
+│   ├── zos_active_started_tasks.yml  
+│   ├── zos_fetch_dataset_from_host.yml  
+│   ├── zos_master_catalog_info.yml  
+│   ├── zos_pds_member_list.yml  
+│   ├── zos_ping.yml  
+│   ├── zos_provision_developer_libraries.yml  
+│   ├── zos_seed_libraries.yml  
+│   ├── zos_submit_jcl_from_local.yml  
+│   └── zos_submit_jcl_inline.yml  
 └── tmp                            Used for intermediate step in file transfers.
 ```
 
