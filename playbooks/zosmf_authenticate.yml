@@ -1,0 +1,51 @@
+---
+#------------------------------------------------------------
+# Demonstrates the use of ibm.ibm_zosmf.zmf_authenticate
+# to authenticate with a z/OSMF server.
+#
+# The values of userid and password are expected to be passed
+# on the command line as extra variables:
+#
+# -e "userid=foo" -e "password=bar"
+#------------------------------------------------------------
+- name: Authenticate to z/OSMF
+  hosts: zoslab
+  gather_facts: false 
+  collections:
+    - ibm.ibm_zos_zosmf
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: Submit authentication request
+      ibm.ibm_zosmf.zmf_authenticate:
+        zmf_host: "{{ ansible_host }}"
+        zmf_port: "{{ zmf_port }}"
+        zmf_user: "{{ userid }}"
+        zmf_password: "{{ password }}"
+      register: zosmf_auth_result
+
+    - name: Save z/OSMF credentials
+      ansible.builtin.set_fact:
+        zosmf_credential: "{{ zosmf_auth_result }}"
+
+    - debug:
+        var: zosmf_credential    
+
+# The following gets "connection refused" on the lab system
+#
+#    - name: List datasets
+#      ansible.builtin.uri:
+#        url: "https://{{ ansible_host }}/zosmf/restfiles/ds?dslevel=IBMUSER.*"
+#        method: GET
+#        user: "{{ userid }}"
+#        password: "{{ password }}"
+#        force_basic_auth: true
+#        headers:
+#          X-CSRF-ZOSMF-HEADER: ""
+#          Accept: application/json
+#        validate_certs: false
+#        return_content: true
+#      register: ds_list
+
+#    - debug:
+#        var: "{{ ds_list }}"  
