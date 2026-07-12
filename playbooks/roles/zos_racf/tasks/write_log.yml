@@ -1,0 +1,6 @@
+- name: Write to local RACF audit log 
+  lineinfile:
+    path: "{{ racf_audit_log }}"
+    line: "{{ lookup('pipe', 'date -u +%Y-%m-%dT%H:%M:%SZ') }} {{ racf_audit_log_line }}"
+    create: true
+  delegate_to: localhost

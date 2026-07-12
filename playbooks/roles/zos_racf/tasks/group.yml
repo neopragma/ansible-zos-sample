@@ -1,0 +1,3 @@
+- name: Process group {{ racf_group }} 
+  debug:
+    msg: "In task 'group' for group {{ racf_group }}"

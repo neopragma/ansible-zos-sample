@@ -1,0 +1,11 @@
+profile: DEV01.**
+class: DATASET
+
+owner: IBMUSER
+
+uacc: NONE
+
+permits:
+
+  - id: DEV01
+    access: ALTER 

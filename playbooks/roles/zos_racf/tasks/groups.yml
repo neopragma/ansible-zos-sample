@@ -1,0 +1,12 @@
+- name: Find group definitions
+  find:
+    paths: "{{ racf_root }}/groups"
+    patterns: "*.yml"
+  delegate_to: localhost
+  register: group_files
+
+- name: Create groups
+  include_tasks: group
+  vars:
+    group_definition: "{{ lookup('file', item.path) | from_yaml }}"
+  loop: "{{ group_files.files }}"

@@ -1,0 +1,27 @@
+# Writes REXX inline, submits it, and copies the output dataset to the control node
+- name: Hello World from inline REXX
+  hosts: zoslab
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: Copy REXX to MVS data set 
+      zos_copy:
+        content: |
+          /* REXX */
+          say 'Hello from inline REXX'
+          exit 0
+        dest: "IBMUSER.LAB.REXX(HELLOREX)"
+        is_binary: false
+        force: True
+      register: output  
+
+    - name: Execute the REXX exec from TSO
+      zos_tso_command:
+        commands:
+          - "EX 'IBMUSER.LAB.REXX(HELLOREX)'"   
+
+    - debug:
+        var: output   

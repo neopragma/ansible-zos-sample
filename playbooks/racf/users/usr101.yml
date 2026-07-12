@@ -1,0 +1,30 @@
+userid: USR101
+
+name: "Developer 1"
+
+owner: IBMUSER
+
+default_group: DEV01   
+
+groups:
+  - DEV01
+
+attributes:
+  special: false
+  operations: false
+  auditor: false
+  revoked: false
+
+omvs:
+  uid: 0101
+  home: /u/dev01
+  program: /bin/sh
+
+tso:
+  acctnum: ACCT001
+  proc: DB13PROC
+  size: 02096128
+  maxsize: 0
+  unit: SYSDA
+  userdata: 0000
+  command: ispf  
