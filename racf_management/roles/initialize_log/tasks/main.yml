@@ -1,0 +1,14 @@
+# ------------------------------------------------------------
+# Role: initialize_log
+#
+# Delete the local RACF audit log.
+#
+# This depends on variable logfile being set.
+# -----------------------------------------------------------
+
+- name: Clear (delete) the local RACF audit log 
+  ansible.builtin.file:
+    path: "{{ logfile }}"
+    state: absent
+  delegate_to: localhost
+  run_once: true

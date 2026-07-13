@@ -1,0 +1,25 @@
+# ------------------------------------------------------------
+# Role: process_group 
+#
+# Apply changes for a single RACF group.
+# -----------------------------------------------------------
+
+- name: Obtain RACF group definition
+  ibm.ibm_zos_core.zos_tso_command:
+    commands:
+      - "LISTGRP {{ group_definition.name }}"
+  register: group_info
+  failed_when: false
+  changed_when: false
+
+- name: Build current_group dictionary
+  ansible.builtin.set_fact:
+    current_group: >-
+      {{
+        group_info.output[0].content
+        | parse_listgrp(group_definition.name)
+      }}
+
+- ansible.builtin.debug:
+    var: current_group
+  when: debug | default(false) | bool

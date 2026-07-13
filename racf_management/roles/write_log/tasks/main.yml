@@ -1,0 +1,25 @@
+# ------------------------------------------------------------
+# Role: Write a log record
+#
+# Write a record to the local RACF audit log.
+#
+# This depends on variables logfile and loglevel being set.
+# ------------------------------------------------------------
+
+- name: Write to local RACF audit log
+  vars:
+    level_map:
+      info: 1
+      warning: 2
+      error: 3
+  lineinfile:
+    path: "{{ logfile }}"
+    line: >-
+      {{ lookup('pipe', 'date -u +%Y-%m-%dT%H:%M:%SZ') }}
+      {{ severity | upper }}:
+      {{ message }}
+    create: true
+  delegate_to: localhost
+  when:
+    - message | default("") | trim != ""
+    - level_map[severity] >= level_map[loglevel]

@@ -1,0 +1,48 @@
+# Variables used in playbooks that issue RACF commands to z/OS.
+
+# ------------------------------------------------------------------
+# initlog: true|false
+#
+# Controls whether the RACF audit log is cleared (deleted) at the
+# start of the "Update RACF Definitions" playbook. When set to
+# false, messages will be appended to the existing log file.
+
+initlog: true
+
+# -----------------------------------------------------------------
+# logfile: path to the RACF audit log file.
+#
+# Relative paths are interpreted relative to [project_root]/playbooks.
+# Absolute paths can be specified, but this is less portable.
+
+logfile: ../logs/racf_audit.log
+
+# -----------------------------------------------------------------
+# loglevel: info|warning|error|none
+#
+# Controls which level of messages are written to the RACF audit log.
+#
+# info: error, warning, and informational messages
+# warning: error and warning messages
+# error: error messages
+# none: no messages
+
+loglevel: info
+
+# -----------------------------------------------------------------
+# racf_definitions: path to the directory tree containing RACF definitions.
+#
+# Playbook "Update RACF Definitions" is driven by the contents of
+# this directory tree. Other playbooks may be developed that 
+# depend on this directory structure. The directory structure
+# should not be changed without careful analysis of the effects.
+# 
+# Files under the GROUPS subdirectory contain specifications for 
+# ADDGROUP and ALTGROUP commands. Files under other subdirectories 
+# follow the same naming pattern. 
+# 
+# Relative paths are interpreted relative to [project_root]/playbooks.
+
+racf_definitions: ../racf_definitions
+
+

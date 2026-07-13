@@ -1,5 +1,6 @@
 - debug:
     var: group_info
+  when: debug | default(false) | bool
 
 - name: Flatten LISTGRP output
   set_fact:
@@ -12,23 +13,186 @@
 
 - debug:
     var: desired_group
+  when: debug | default(false) | bool
 
 - debug:
     var: current_group
+  when: debug | default(false) | bool
 
 - debug:
     var: group_changes
+  when: debug | default(false) | bool
+
+- name: Initialize ALTGROUP operand list
+  set_fact:
+    altgroup_operands: []
+
+- name: Add OWNER operand
+  set_fact:
+    altgroup_operands: >-
+      {{ altgroup_operands + [
+           'OWNER(' ~
+           group_changes.attributes_changed.owner.desired ~
+           ')'
+         ] }}
+  when: "'owner' in group_changes.attributes_changed"
+
+- name: Add SUPGROUP operand
+  set_fact:
+    altgroup_operands: >-
+      {{ altgroup_operands + [
+           'SUPGROUP(' ~
+           group_changes.attributes_changed.superior.desired ~
+           ')'
+         ] }}
+  when: "'superior' in group_changes.attributes_changed"
+
+- name: Add DATA operand
+  set_fact:
+    altgroup_operands: >-
+      {{ altgroup_operands + [
+           "DATA('" ~
+           group_changes.attributes_changed.installation_data.desired ~
+           "')"
+         ] }}
+  when: "'installation_data' in group_changes.attributes_changed"
+
+- name: Add MODEL operand
+  set_fact:
+    altgroup_operands: >-
+      {{ altgroup_operands + [
+           'MODEL(' ~
+           group_changes.attributes_changed.model_dataset.desired ~
+           ')'
+         ] }}
+  when:
+    - "'model_dataset' in group_changes.attributes_changed"
+    - group_changes.attributes_changed.model_dataset.desired | length > 0
+
+- name: Add NOMODEL operand
+  set_fact:
+    altgroup_operands: >-
+      {{ altgroup_operands + ['NOMODEL'] }}
+  when:
+    - "'model_dataset' in group_changes.attributes_changed"
+    - group_changes.attributes_changed.model_dataset.desired | length == 0
+
+- name: Add TERMUACC operand
+  set_fact:
+    altgroup_operands: >-
+      {{ altgroup_operands + ['TERMUACC'] }}
+  when:
+    - "'termuacc' in group_changes.attributes_changed"
+    - group_changes.attributes_changed.termuacc.desired
+
+- name: Add NOTERMUACC operand
+  set_fact:
+    altgroup_operands: >-
+      {{ altgroup_operands + ['NOTERMUACC'] }}
+  when:
+    - "'termuacc' in group_changes.attributes_changed"
+    - not group_changes.attributes_changed.termuacc.desired
 
 - name: Build ALTGROUP command
   set_fact:
     altgroup_cmd: >-
       ALTGROUP {{ group_definition.name }}
-      DATA('{{ group_changes.attributes_changed.installation_data.desired }}')
-  when:
-    - "'installation_data' in group_changes.attributes_changed"
+      {{ altgroup_operands | join(' ') }}
+  when: altgroup_operands | length > 0
 
 - debug:
-    var: altgroup_cmd    
+    var: altgroup_cmd 
+  when: debug | default(false) | bool
+
+- name: Initialize CONNECT command list
+  set_fact:
+    connect_cmds: [] 
+
+- name: Build CONNECT commands
+  set_fact:
+    connect_cmds: >-
+      {{
+        connect_cmds +
+        [
+          'CONNECT ' ~
+          connect_item.userid ~
+          ' GROUP(' ~
+          group_definition.name ~
+          ')' ~
+          ' AUTHORITY(' ~
+          connect_item.authority ~
+          ')'
+        ]
+      }}
+  loop: "{{ group_changes.connections_to_add }}"
+  loop_control:
+    loop_var: connect_item
+
+- debug:
+    var: connect_cmds 
+  when: debug | default(false) | bool
+
+- name: Initialize REMOVE command list
+  set_fact:
+    remove_cmds: []
+
+- name: Build REMOVE commands
+  set_fact:
+    remove_cmds: >-
+      {{
+        remove_cmds +
+        [
+          'REMOVE ' ~
+          remove_item.userid ~
+          ' GROUP(' ~
+          group_definition.name ~
+          ')'
+        ]
+      }}
+  loop: "{{ group_changes.connections_to_remove }}"
+  loop_control:
+    loop_var: remove_item 
+
+- debug:
+    var: remove_cmds  
+  when: debug | default(false) | bool
+
+- name: Initialize RACF plan
+  set_fact:
+    racf_plan: []
+
+- name: Add ALTGROUP command
+  set_fact:
+    racf_plan: "{{ racf_plan + [altgroup_cmd] }}"
+  when: altgroup_cmd is defined
+
+- name: Add CONNECT commands
+  set_fact:
+    racf_plan: "{{ racf_plan + connect_cmds }}"
+  when: connect_cmds | length > 0
+
+- name: Add REMOVE commands
+  set_fact:
+    racf_plan: "{{ racf_plan + remove_cmds }}"
+  when: remove_cmds | length > 0
+
+- debug:
+    var: racf_plan
+  when: debug | default(false) | bool
+
+- name: Execute RACF plan
+  ibm.ibm_zos_core.zos_tso_command:
+    commands:
+      - "{{ racf_command }}"
+  loop: "{{ racf_plan }}"
+  loop_control:
+    loop_var: racf_command
+  register: racf_results 
+
+- debug:
+    var: racf_results  
+  when: debug | default(false) | bool
+
 
 # Update behavior with racf_update_precedence = 'zos'
 #

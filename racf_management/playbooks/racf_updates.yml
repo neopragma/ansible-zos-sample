@@ -1,0 +1,48 @@
+# ------------------------------------------------------------
+# Playbook: racf_updates
+#
+# Applies changes to a z/OS managed node based on declarative
+# definitions of RACF groups, users, and resources. Supports
+# an Infrastructure as Code approach to managing RACF
+# definitions. 
+#
+# Variables. Define in inventory or pass with -e option.
+#
+# "logfile=path"                   Path to RACF audit log file
+#                                  relative to project root.
+#                                  Default: (none)
+#
+# "loglevel=info|warn|error|none"  Minimum severity to log.
+#                                  Default: info                            
+#
+# "initlog=true|false"             Initialize (delete) the
+#                                  RACF audit log file at the
+#                                  beginning of this run.
+#                                  Default: false
+#
+# "debug=true|false"               Enable Ansible debug tasks
+#                                  Default: false
+#
+# "apply_to=hostname"              Which hosts to run against.
+#                                  Default: (none)
+#
+# "dry_run=true|false"             List significant variable
+#                                  values but do not apply
+#                                  maintenance to the z/OS nodes.                                                                   
+# ------------------------------------------------------------
+
+- name: Update RACF Security Definitions
+  hosts: "{{ apply_to }}"
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: Preamble 
+      include_role:
+        name: racf_preamble
+
+    - name: Apply RACF Group definitions
+      ansible.builtin.include_role:
+        name: process_groups

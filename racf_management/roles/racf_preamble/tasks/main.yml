@@ -1,0 +1,37 @@
+# ------------------------------------------------------------
+# Role: racf_preamble
+#
+# Perform initialization tasks prior to processing the RACF
+# definitions. 
+# ------------------------------------------------------------
+
+- name: Dry run
+  ansible.builtin.debug:
+    msg:
+      - "initlog: {{ initlog }}"
+      - "logfile: {{ logfile }}"
+      - "loglevel: {{ loglevel }}"
+      - "racf_definitions: {{ racf_definitions }}"
+      - "apply_to: {{ apply_to }}"
+      - "all defined hosts: {{ groups['all']  }}"
+      - "environment variables: {{ environment_vars }}"
+      - "Documentation: See inventory/group_vars/all/racf.yml"
+  when: dry_run | default('false') == 'true'
+
+- name: End play
+  meta: end_play
+  when: dry_run | default('false') == 'true'
+
+- name: Initialize RACF audit log
+  include_role:
+    name: initialize_log
+  ignore_errors: true
+  when: "{{ initlog | default(false) is true }}"
+
+- name: Log the start of this process
+  include_role:
+    name: write_log
+  vars:
+    severity: info
+    message: "Update RACF Security Definitions on {{ apply_to }}"
+  ignore_errors: true

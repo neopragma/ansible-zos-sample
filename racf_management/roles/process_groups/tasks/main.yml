@@ -1,0 +1,22 @@
+# ------------------------------------------------------------
+# Role: process_groups
+#
+# Apply changes to RACF Group definitions based on declarative
+# definitions managed under version control.
+# ------------------------------------------------------------
+#
+- name: Find group definition files
+  ansible.builtin.find:
+    paths: "{{ racf_definitions }}/groups"
+    patterns: "*.yml"
+  delegate_to: localhost
+  register: group_files
+
+- name: Process each group
+  ansible.builtin.include_tasks: process_group.yml
+  loop: "{{ group_files.files }}"
+  loop_control:
+    loop_var: group_file
+  vars:
+    group_definition: "{{ lookup('file', group_file.path) | from_yaml }}"
+

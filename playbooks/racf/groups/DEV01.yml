@@ -3,9 +3,9 @@ name: DEV01
 attributes:
   owner: IBMUSER
   superior: SYS1
-  installation_data: NEW AND IMPROVED DEVELOPMENT GROUP
-  model_dataset: null
-  termuacc: false
+  installation_data: SOFTWARE DEVELOPMENT TEAM 1
+  model_dataset: ""          # Value of "" results in NOMODEL
+  termuacc: false            # Value of false results in NOTERMACC
 
 connections:
   - userid: USER01
