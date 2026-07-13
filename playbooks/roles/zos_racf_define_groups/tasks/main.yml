@@ -1,0 +1,14 @@
+- name: Find group definitions
+  find:
+    paths: "{{ racf_root }}/groups"
+    patterns: "*.yml"
+  delegate_to: localhost
+  register: group_files
+
+- name: Create groups
+  include_role: 
+    name: zos_racf_define_group
+  vars:
+    group_definition: "{{ lookup('file', item.path) | from_yaml }}"
+    racf_group_id: "{{ group_definition.name }}"
+  loop: "{{ group_files.files }}"

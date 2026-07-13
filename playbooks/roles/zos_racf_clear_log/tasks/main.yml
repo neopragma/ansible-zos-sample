@@ -1,0 +1,6 @@
+- name: Clear (delete) the local RACF audit log 
+  ansible.builtin.file:
+    path: "{{ racf_audit_log }}"
+    state: absent
+  delegate_to: localhost
+  run_once: true

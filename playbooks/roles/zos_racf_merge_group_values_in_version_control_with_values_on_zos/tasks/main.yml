@@ -1,0 +1,45 @@
+- debug:
+    var: group_info
+
+- name: Flatten LISTGRP output
+  set_fact:
+    desired_group: "{{ group_definition }}"
+    current_group: "{{ group_info.output[0].content | parse_listgrp }}"
+
+- set_fact:
+    group_changes: >-
+      {{ desired_group | compare_group(current_group) }}
+
+- debug:
+    var: desired_group
+
+- debug:
+    var: current_group
+
+- debug:
+    var: group_changes
+
+- name: Build ALTGROUP command
+  set_fact:
+    altgroup_cmd: >-
+      ALTGROUP {{ group_definition.name }}
+      DATA('{{ group_changes.attributes_changed.installation_data.desired }}')
+  when:
+    - "'installation_data' in group_changes.attributes_changed"
+
+- debug:
+    var: altgroup_cmd    
+
+# Update behavior with racf_update_precedence = 'zos'
+#
+# desired       current      equal?  use
+#
+# present       not present   n/a    desired
+# present       present       no     desired
+# present       present       yes    current (no change)
+# not present   present       n/a    current (no change)
+# '*remove*'    present       n/a    remove
+# '*remove*'    not present   n/a    current (no change)
+#
+# If there are any changes, submit altgroup command
+# else bypass. Write to log only if ALTGROUP is submitted.

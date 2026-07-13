@@ -1,0 +1,12 @@
+- name: Build ADDGROUP command for {{ racf_group_id }}
+  include_tasks:
+    file: build_addgroup_command.yml
+  when: "{{ racf_update_precedence == 'vc' or not group_exists }}"
+
+- name: Submit ADDGROUP command for {{ racf_group_id }}
+  include_role:
+    name: zos_racf_add_group
+  vars:
+    message: "Adding RACF group {{ racf_group_id }} on host {{ inventory_hostname }}"
+    severity: info
+  when: "{{ racf_update_precedence == 'vc' or not group_exists }}"

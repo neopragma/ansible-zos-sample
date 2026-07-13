@@ -1,0 +1,11 @@
+- name: Log group addition    
+  include_role:
+    name: zos_racf_write_log
+
+- name: Add group {{ racf_group_id }}
+  ibm.ibm_zos_core.zos_tso_command:
+    commands:
+      - "{{ addgroup_cmd }}"
+  register: addgroup_result
+  ignore_errors: true
+

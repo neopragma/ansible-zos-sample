@@ -1,0 +1,13 @@
+- name: Build ADDGROUP command
+  set_fact:
+    addgroup_cmd: >-
+      ADDGROUP {{ group_definition.name }}
+      {% if group_definition.superior is defined %}
+      SUPGROUP({{ group_definition.superior }})
+      {% endif %}
+      {% if group_definition.owner is defined %}
+      OWNER({{ group_definition.owner }})
+      {% endif %}
+      {% if group_definition.description is defined %}
+      DATA('{{ group_definition.description }}')
+      {% endif %}

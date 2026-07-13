@@ -1,0 +1,81 @@
+# Variables used in playbooks that issue RACF commands to z/OS.
+
+# ------------------------------------------------------------------
+# initlog: true|false
+#
+# Controls whether the RACF audit log is cleared (deleted) at the
+# start of the "Update RACF Definitions" playbook. When set to
+# false, messages will be appended to the existing log file.
+
+initlog: true
+
+# -----------------------------------------------------------------
+# racf_audit_log: path to the RACF audit log file.
+#
+# Relative paths are interpreted relative to [project_root]/playbooks.
+# Absolute paths can be specified, but this is less portable.
+
+racf_audit_log: ../logs/racf_audit.log
+
+# -----------------------------------------------------------------
+# racf_log_level: info|warning|error|none
+#
+# Controls which level of messages are written to the RACF audit log.
+#
+# info: error, warning, and informational messages
+# warning: error and warning messages
+# error: error messages
+# none: no messages
+
+racf_log_level: info
+
+# -----------------------------------------------------------------
+# racf_root: path to the directory tree containing RACF definitions.
+#
+# Playbook "Update RACF Definitions" is driven by the contents of
+# this directory tree. Other playbooks may be developed that 
+# depend on this directory structure. The directory structure
+# should not be changed without careful analysis of the effects.
+# 
+# Files under the GROUPS subdirectory contain specifications for 
+# ADDGROUP and ALTGROUP commands. Files under other subdirectories 
+# follow the same naming pattern. 
+# 
+# Relative paths are interpreted relative to [project_root]/playbooks.
+# Absolute paths can be specified, but this is less portable.
+
+racf_root: ./racf
+
+# -----------------------------------------------------------------
+# racf_update_precedence: vc (version control)
+#
+# Existing RACF definitions are completely replaced by whatever
+# is defined in the RACF files under version control. Any changes
+# that were made directly on the z/OS instance are lost. 
+#
+# This setting supports an Infrastructure as Code approach to
+# system maintenance. Organization policy prohibits directly
+# modifying RACF definitions on the z/OS node without going 
+# through a CI/CD pipeline. The definitions under version control 
+# are the single source of truth. 
+#
+# However, RACF definitions that exist on the z/OS node
+# and are not mentioned at all in the version-controlled files
+# will not be affected. In addition, no deletions are performed.
+# This prevents definitions that have not yet been converted to
+# Infrastructure as Code from being deleted or broken by the
+# pipeline process.
+#
+# racf_update_precedence: zos (z/OS)
+# Existing RACF specifications are not replaced by those in the
+# version-controlled files. RACF definitions are altered rather
+# than replaced. 
+#
+# Changes that were made directly on the z/OS node 
+# will not be affected unless specific fields are specified in 
+# the version-controlled definitions. In that case, the values 
+# from the version-controlled definitions will be applied.
+# Values that are not mentioned in the version-controlled files
+# will not be modified.
+
+racf_update_precedence: vc

@@ -1,0 +1,37 @@
+- name: Flatten LISTGRP output
+  set_fact:
+    listgrp_text: "{{ group_info.output[0].content | join('\n') }}"
+
+- name: Parse LISTGRP output
+  set_fact:
+    racf_group_zos:
+      name: >-
+        {{
+          listgrp_text
+          | regex_search('INFORMATION FOR GROUP\\s+([A-Z0-9@$#]+)', '\1')
+          | first
+        }}
+      superior: >-
+        {{
+          listgrp_text
+          | regex_search('SUPERIOR GROUP=([A-Z0-9@$#]+)', '\1')
+          | first
+        }}
+      owner: >-
+        {{
+          listgrp_text
+          | regex_search('OWNER=([A-Z0-9@$#]+)', '\1')
+          | first
+        }}
+      install_data: >-
+        {{
+          (listgrp_text
+          | regex_search('INSTALLATION DATA=(.*)', '\1')
+          | first
+          | trim)
+        }}
+      has_model_dataset: "{{ 'NO MODEL DATA SET' not in listgrp_text }}"
+      has_users: "{{ 'NO USERS' not in listgrp_text }}"
+
+- debug:
+    var: racf_group_zos    

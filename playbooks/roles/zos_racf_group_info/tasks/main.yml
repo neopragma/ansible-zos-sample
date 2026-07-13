@@ -1,0 +1,12 @@
+- name: Get RACF group info and set group existence indicator
+  ibm.ibm_zos_core.zos_tso_command:
+    commands:
+      - "listgrp {{ racf_group_id }}"
+  register: listgrp_result
+  ignore_errors: true
+
+- name: Set group existence indicator 
+  set_fact:
+    group_exists: "{{ not listgrp_result.output[0].failed }}"
+    group_info: "{{ listgrp_result }}"
+  ignore_errors: true

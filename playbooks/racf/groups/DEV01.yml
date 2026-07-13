@@ -1,6 +1,12 @@
 name: DEV01
 
-owner: IBMUSER
-superior: SYS1
+attributes:
+  owner: IBMUSER
+  superior: SYS1
+  installation_data: NEW AND IMPROVED DEVELOPMENT GROUP
+  model_dataset: null
+  termuacc: false
 
-description: Application Development Group
+connections:
+  - userid: USER01
+    authority: USE

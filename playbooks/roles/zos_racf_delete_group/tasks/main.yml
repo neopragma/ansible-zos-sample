@@ -1,0 +1,11 @@
+- name: Log group deletion    
+  include_role:
+    name: zos_racf_write_log
+
+- name: Delete group {{ racf_group_id }}
+  ibm.ibm_zos_core.zos_tso_command:
+    commands:
+      - "delgroup {{ racf_group_id }}"
+  register: delgroup_result
+  ignore_errors: true
+

@@ -3,8 +3,19 @@
 # and resource definitions based on information in files found 
 # under subdirectory racf_root. See inventory/group_vars/racf
 # for the value of racf_root.
+#
 # To initialize (clear) the racf audit log, run the playbook
 # with -e "initlog=true"
+#
+# By default, audit records are appended to the existing log
+# file.
+#
+# If you want to initialize the log every time by default, 
+# define "initlog: true" under group_vars.
+#
+# To see a list of the effective values of key variables
+# without doing anything to the managed nodes, run with
+# -e "dry_run=true"
 # ------------------------------------------------------------
 - name: Update RACF Security Definitions
   hosts: zoslab
@@ -14,82 +25,106 @@
   environment: "{{ environment_vars }}"
 
   tasks:
+    - name: Dry run
+      debug:
+        msg:
+          - "initlog: {{ initlog }}"
+          - "racf_audit_log: {{ racf_audit_log }}"
+          - "racf_log_level: {{ racf_log_level }}" 
+          - "racf_root: {{ racf_root }}"
+          - "racf_update_precedence: {{ racf_update_precedence }}"
+          - "hosts: {{ groups['all']  }}"
+          - "environment variables: {{ environment_vars }}"
+          - "Documentation: See ./inventory/group_vars/all/racf.yml"
+      when: dry_run | default('false') == 'true'
+       
+    - name: End play
+      meta: end_play
+      when: dry_run | default('false')  == 'true'
+
     - name: Initialize RACF audit log
       include_role:
-        name: zos_racf
-        tasks_from: clear_log
+        name: zos_racf_clear_log
       ignore_errors: true
-      when: "{{ initlog == 'true' }}"
+      when: "{{ initlog == 'true' or initlog is true }}"
 
-    - name: Process group definitions in racf_root/groups
+    - name: Log the start of this process
       include_role:
-        name: zos_racf
-        tasks_from: groups
+        name: zos_racf_write_log 
+      vars:
+        severity: info
+        message: "Update RACF Security Definitions"
+      ignore_errors: true
+
+    - name: Process group definitions in {{ racf_root }}/groups
+      include_role:
+        name: zos_racf_define_groups
       ignore_errors: true  
 
-
-    - name: Get info for RACF group {{ racf_group }}
-      include_role:
-        name: zos_racf
-        tasks_from: group_info
-      vars:
-        racf_group: GRP01
-
-
-    - name: Check if userid {{ racf_userid }} is a member of group {{ racf_group }} 
-      set_fact:
-        user_in_group: >-
-          {{
-            group_info.output[0].content
-            | select('search', racf_userid | trim)
-            | list
-            | length > 0
-          }}
-      when: group_exists
-
-    - name: Userid {{ racf_userid }} is already a member of group {{ racf_group }}
-      include_role:
-        name: zos_racf
-        tasks_from: write_log  
-      vars:
-        racf_audit_log_line: "{{ racf_userid }} is already a member of group {{ racf_group }}"  
-      when: user_in_group 
-
-    - name: Userid {{ racf_userid }} is not a member of group {{ racf_group }}
-      include_role:
-        name: zos_racf
-        tasks_from: write_log  
-      vars:
-        racf_audit_log_line: "{{ racf_userid }} is not a member of group {{ racf_group }}"  
-      when: "{{ not user_in_group }}" 
+#
+#
+#    - name: Get info for RACF group {{ racf_group_id }}
+#      include_role:
+#        name: zos_racf
+#        tasks_from: group_info
+#      vars:
+#        racf_group_id: GRP01
 
 
-    - name: Delete 2nd RACF group before trying conditional logic below
-      zos_tso_command:
-        commands:
-          - "delgroup grp02"
-      register: group_info
-      ignore_errors: true
+#    - name: Check if userid {{ racf_user_id }} is a member of group {{ racf_group_id }} 
+#      set_fact:
+#        user_in_group: >-
+#          {{
+#            group_info.output[0].content
+#            | select('search', racf_user_id | trim)
+#            | list
+#            | length > 0
+#          }}
+#      when: group_exists
 
-    - name: Check existence of RACF group {{ racf_group }}
-      include_role:
-        name: zos_racf
-        tasks_from: group_info
-      vars:
-        racf_group: GRP02
+#    - name: Userid {{ racf_user_id }} is already a member of group {{ racf_group_id }}
+#      include_role:
+#        name: zos_racf
+#        tasks_from: write_log  
+#      vars:
+#        racf_audit_log_line: "{{ racf_userid }} is already a member of group {{ racf_group }}"  
+#      when: user_in_group 
 
-    - debug:
-        msg: "{{ racf_group }} exists? {{ group_exists }}"
+#    - name: Userid {{ racf_userid }} is not a member of group {{ racf_group }}
+#      include_role:
+#        name: zos_racf
+#        tasks_from: write_log  
+#      vars:
+#        racf_audit_log_line: "{{ racf_userid }} is not a member of group {{ racf_group }}"  
+#      when: "{{ not user_in_group }}" 
 
 
-    - name: Add RACF group
-      zos_tso_command:
-        commands:
-          - "addgroup grp02"
-      register: output
-      ignore_errors: true 
-      when: group_info.output[0].failed
+#    - name: Delete 2nd RACF group before trying conditional logic below
+#      zos_tso_command:
+#        commands:
+#          - "delgroup grp02"
+#      register: group_info
+#      ignore_errors: true
 
-    - debug:
-        var: output
+#    - name: Check existence of RACF group {{ racf_group }}
+#      include_role:
+#        name: zos_racf
+#        tasks_from: group_info
+#      vars:
+#        racf_group: GRP02
+
+#    - debug:
+#        msg: "{{ racf_group }} exists? {{ group_exists }}"
+
+
+#    - name: Add RACF group
+#      zos_tso_command:
+#        commands:
+#          - "addgroup grp02"
+#      register: output
+#      ignore_errors: true 
+#      when: group_info.output[0].failed
+
+#    - debug:
+#        var: output
 

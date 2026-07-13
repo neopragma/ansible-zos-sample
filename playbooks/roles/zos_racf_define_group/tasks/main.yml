@@ -1,0 +1,32 @@
+- name: If group {{ racf_group_id }} exists, populate group_info with its values
+  include_role:
+    name: zos_racf_group_info 
+
+- name: Version-controlled values will overwrite existing group definition
+  include_role:
+    name: zos_racf_delete_group
+  vars:
+    message: "Deleting existing RACF group {{ racf_group_id }} on host {{ inventory_hostname }} because racf_update_precedence is 'vc' (Version-controlled values override existing values)"
+    severity: warning  
+  when: 
+    - "{{ group_exists }}"
+    - "{{ racf_update_precedence == 'vc' }}"  
+
+- name: Add group {{ racf_group_id }} if it does not exist or if racf_update_precedence is vc
+  include_role:
+    name: zos_racf_build_and_submit_addgroup_command
+  vars:
+    message: "Adding RACF group {{ racf_group_id }} on host {{ inventory_hostname }}"
+    severity: info
+  when: "{{ racf_update_precedence == 'vc' or not group_exists }}"
+
+- name: Alter group {{ racf_group_id }} if it exists and racf_update_precedence is zos
+  include_role:
+    name: zos_racf_merge_group_values_in_version_control_with_values_on_zos
+  vars:
+    message: "Altering RACF group {{ racf_group_id }} on host {{ inventory_hostname }}, accepting existing values from host over different values from version control, because racf_update_precedence is 'zos' (values defined directly on z/OS override values from version control)"
+    severity: warning
+  when:
+    - "{{ group_exists }}"
+    - "{{ racf_update_precedence == 'zos' }}"  
+
