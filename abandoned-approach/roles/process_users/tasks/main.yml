@@ -1,0 +1,41 @@
+# ------------------------------------------------------------
+# Role: process_users
+#
+# Apply changes to RACF Users based on declarative
+# definitions managed under version control.
+# ------------------------------------------------------------
+
+- name: Find user definition files
+  ansible.builtin.find:
+    paths: "{{ racf_definitions }}/users"
+    patterns: "*.yml"
+  delegate_to: localhost
+  register: user_files
+
+- name: Show user definition files
+  ansible.builtin.debug:
+    var: user_files
+  when: debug | default(false) | bool  
+
+- name: Process each user
+  ansible.builtin.include_tasks: process_user.yml
+  loop: "{{ user_files.files }}"
+  loop_control:
+    loop_var: user_file
+  vars:
+    desired_user: "{{ lookup('file', user_file.path) | from_yaml }}"
+  when: user_files.files | length > 0
+
+- name: No user definitions found 
+  # This means there are no user definitions to apply to the managed node
+  include_role:
+      name: write_log
+  vars:    
+    severity: error
+    message: "No user definition files were found at {{ racf_definitions }}/users."
+  ignore_errors: true
+  when: user_files.files | length == 0
+
+- name: End play
+  meta: end_play
+  when: userp_files.files | length == 0

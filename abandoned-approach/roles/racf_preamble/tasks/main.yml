@@ -16,17 +16,21 @@
       - "all defined hosts: {{ groups['all']  }}"
       - "environment variables: {{ environment_vars }}"
       - "Documentation: See inventory/group_vars/all/racf.yml"
-  when: dry_run | default('false') == 'true'
-
-- name: End play
-  meta: end_play
-  when: dry_run | default('false') == 'true'
+  when: dry_run | default(false) | bool
 
 - name: Initialize RACF audit log
   include_role:
     name: initialize_log
   ignore_errors: true
-  when: "{{ initlog | default(false) is true }}"
+  when: initlog | default(false) | bool
+
+- name: Log the start of a dry run
+  include_role:
+    name: write_log
+  vars:
+    severity: info
+    message: "**** Beginning dry run. No modifications will be made to managed nodes. ****"
+  when: dry_run | default(false) | bool  
 
 - name: Log the start of this process
   include_role:

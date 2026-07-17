@@ -1,0 +1,14 @@
+#------------------------------------------------------------
+# Wrapper for ansible-playbook
+# 
+# play foo --limit host4
+#
+# results in
+#
+# ansible-playbook playbooks/smooth_play.yml --limit host4
+#-----------------------------------------------------------
+
+[ "$#" -lt 1 ] && { echo "Usage: $0 playbookname [args]"; exit 1; }
+_playbook="$1"
+shift
+ansible-playbook "playbooks/${_playbook}".yml "$@"		

@@ -1,0 +1,52 @@
+# ------------------------------------------------------------
+# Role: process_profile_type
+# 
+# Reads profile information for one type of profile from 
+# directory racf_profiles and applies it to inventory_host 
+# by issuing TSO commands.
+# ------------------------------------------------------------
+
+- name: Log the start of this role
+  include_role:
+      name: write_log
+  vars:    
+    severity: info
+    message: "Starting process_profile_type for { profile_type }}."
+
+- name: "Find {{ profile_type }} profile files"
+  ansible.builtin.find:
+    paths: "{{ racf_profiles }}/{{ profile_type }}"
+    patterns: ['*.yml']
+    file_type: file
+    recurse: false
+  delegate_to: localhost
+  register: profile_files
+
+- name: "List {{ profile_type}} profile files (debug)"
+  ansible.builtin.debug:
+    msg: "{{ profile_files.files | map(attribute='path') | map('basename') | join('\n') }}"
+  loop: "{{ profile_files.files | map(attribute='path') | list }}"
+  when: debug | default(false) | bool  
+
+- name: "Inform user that no {{ profile_type }} profile files were found"
+  ansible.builtin.debug:
+    msg: "No {{ profile_type }} profiles were found at {{ racf_profiles }}/{{ profile_type}}. Cannot continue."
+  when: profile_files.files | length == 0  
+
+- name: Write error message to audit log
+  include_role:
+      name: write_log
+  vars:    
+    severity: error
+    message: "No {{ profile_type }} profile files were found at {{ racf_profiles }}/{{ profile_type }}. Ending play."
+  ignore_errors: true
+  when: profile_files.files | length == 0
+
+- name: End play
+  meta: end_play
+  when: profile_files.files | length == 0
+
+- name: "Initiate {{ profile_type }} processing"
+  include_tasks: "apply_{{ profile_type }}.yml"
+
+

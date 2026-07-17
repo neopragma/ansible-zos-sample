@@ -1,1 +1,2 @@
-2026-07-13T18:01:22Z INFO: Update RACF Security Definitions on zoslab
+2026-07-15T23:05:26Z INFO: **** Beginning dry run. No modifications will be made to managed nodes. ****
+2026-07-15T23:05:26Z INFO: Starting apply_profiles on zoslab

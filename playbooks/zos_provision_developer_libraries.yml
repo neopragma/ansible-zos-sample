@@ -34,7 +34,7 @@
 
     - ansible.builtin.assert:
         that: hlq is defined
-        fail_msg: 'The z/OS userid must be passed on command line: ansible-playbook blah -e "userid"'
+        fail_msg: 'The z/OS userid must be passed on command line: ansible-playbook blah -e "userid=value"'
 
     - name: Submit one job per library
       ansible.builtin.include_role:

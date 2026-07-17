@@ -1,0 +1,41 @@
+# ------------------------------------------------------------
+# Tasks: submit_one_command 
+#
+# This is invoked in a loop by submit_tso_commands so that we
+# can execute, check results, and log each command in a list.
+# ------------------------------------------------------------
+
+- name: Submit {{ tso_command.command }}
+  ibm.ibm_zos_core.zos_tso_command:
+    commands:
+      - "{{ tso_command.command }}"
+  register: command_execution
+  ignore_errors: true
+
+- name: Normalize command result values
+  ansible.builtin.set_fact:
+    command_result:
+      command: "{{ tso_command.command }}"
+      name: "{{ tso_command.name }}"
+      object_type: "{{ tso_command.object_type }}"
+      rc: "{{ command_execution.output[0].rc | int }}"
+      failed: "{{ command_execution.output[0].failed | bool }}"
+
+- name: Append normalized values to command_results
+  ansible.builtin.set_fact:
+    command_results: "{{ command_results + [ command_result ] }}"
+
+- name: Log the command 
+  include_role:
+    name: write_log
+  vars:
+    severity: "{{ 'info' if command_execution.output[0].rc == 0 else 'error' }}"
+    message: "RC={{ command_execution.output[0].rc }} COMMAND={{ tso_command.command }}"  
+
+- name: Display result
+  ansible.builtin.debug:
+    msg:
+      command: "{{ tso_command.command }}"
+      rc: "{{ command_execution.output[0].rc }}"
+  when: debug | default(false) | bool    
+

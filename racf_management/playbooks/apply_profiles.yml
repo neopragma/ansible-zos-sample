@@ -1,0 +1,69 @@
+# ------------------------------------------------------------
+# Playbook: apply_profiles
+#
+# Applies changes to one or more z/OS managed nodes based on 
+# declarative definitions of RACF profiles for userids,      
+# groups, and resources. 
+#
+# Supports an Infrastructure as Code approach to managing RACF
+# definitions. Existing profiles are deleted and entirely
+# replaced by profiles generated from RACF profile definitions
+# stored on the Ansble control node. It does not merge new
+# values with existing ones.
+#
+# Variables. Define in inventory or pass with -e option.
+#
+# "apply_to=host"                  The host name defined in
+#                                  inventory that will be
+#                                  configured in this run.
+#                                   
+# "logfile=path"                   Path to RACF audit log file
+#                                  relative to project root.
+#                                  Default: see inventory
+#
+# "loglevel=info|warn|error|none"  Minimum severity to log.
+#                                  Default: see inventory                     
+#
+# "initlog=true|false"             Initialize (delete) the
+#                                  RACF audit log file at the
+#                                  beginning of this run.
+#                                  Default: see inventory
+#
+# "debug=true|false"               Enable Ansible debug tasks
+#                                  Default: false
+#
+# "apply_to=hostname"              Which hosts to run against.
+#                                  Default: see inventory
+#
+# "dry_run=true|false"             List significant variable
+#                                  values but do not apply
+#                                  maintenance to the z/OS nodes.                                                                   
+#
+# "racf_profiles=path"             Path to RACF profile definitions.
+#                                  Default: see inventory
+# ------------------------------------------------------------
+
+- name: Apply RACF profiles
+  hosts: "{{ apply_to }}"
+#  hosts: zoslab
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: verify RACF vars in play context
+      debug:
+        msg: 
+          - "apply_to={{ apply_to }}"
+          - "logfile={{ logfile | default('UNDEFINED') }}"
+          - "racf_profiles={{ racf_profiles | default('UNDEFINED') }}"
+      when: debug | default(false) | bool
+
+    - name: Preamble 
+      include_role:
+        name: preamble
+
+    - name: Process RACF profiles 
+      ansible.builtin.include_role:
+        name: process_profiles

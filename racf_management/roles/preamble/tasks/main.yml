@@ -1,0 +1,59 @@
+# ------------------------------------------------------------
+# Role: preamble
+#
+# Perform initialization tasks prior to processing the RACF
+# definitions:
+#
+# 1. If this is a dry run (-e "dry_run=true") display the
+#    values of certain Ansible variables and environment
+#    variables and show where to look for documentation.
+#
+# 2. If the RACF audit log is to be initialized prior to
+#    starting this run (-e "initlog=true"), delete the
+#    log file on localhost.
+#
+# 3. If this is a dry run, log the start a dry run.
+#
+# 4. If this is not a dry run, log the start of a normal run.       
+# ------------------------------------------------------------
+
+- name: Dry run
+  ansible.builtin.debug:
+    msg:
+      - "initlog: {{ initlog }}"
+      - "logfile: {{ logfile }}"
+      - "loglevel: {{ loglevel }}"
+      - "racf_profiles: {{ racf_profiles }}"
+      - "apply_to: {{ apply_to }}"
+      - "all defined hosts: {{ groups['all']  }}"
+      - "environment variables: {{ environment_vars }}"
+      - "Documentation: See inventory/group_vars/all/racf.yml"
+  when: dry_run | default(false) | bool
+
+- name: Initialize RACF audit log
+  include_role:
+    name: initialize_log
+  ignore_errors: true
+  when: initlog | default(false) | bool
+
+- name: Log the start of a dry run
+  include_role:
+    name: write_log
+  vars:
+    severity: info
+    message: "**** Beginning dry run. No modifications will be made to managed nodes. ****"
+  when: dry_run | default(false) | bool  
+
+- name: Log the start of this process
+  include_role:
+    name: write_log
+  vars:
+    override_level: true
+    severity: info
+    message: "Starting apply_profiles on {{ apply_to }}"
+
+- name: Ensure variable racf_profiles is set and points to a directory on localhost 
+  include_role:
+    name: check_racf_profiles_path 
+
+

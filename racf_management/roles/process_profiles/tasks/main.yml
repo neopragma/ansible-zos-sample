@@ -1,0 +1,24 @@
+# ------------------------------------------------------------
+# Role: process_profiles
+# 
+# Reads profile information from directory racf_profiles and
+# applies them to inventory_host by issuing TSO commands.
+#
+# User profiles must be applied first because they are
+# referenced in group and resource profiles.
+#
+# Group profiles must be applied next because they are
+# referenced in resource profiles.
+# ------------------------------------------------------------
+
+- name: Process each type of profile information
+  ansible.builtin.include_tasks: process_profile_type.yml
+  vars:
+    profile_type: "{{ type_item }}"
+  loop:
+    - users
+    - groups
+    - resources
+  loop_control:
+    loop_var: type_item  
+

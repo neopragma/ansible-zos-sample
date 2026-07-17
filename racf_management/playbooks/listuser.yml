@@ -1,0 +1,45 @@
+- name: View LISTUSER output
+  hosts: zoslab
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  environment:
+    - "{{ environment_vars }}"
+
+  tasks:
+  - name: Obtain RACF user definition
+    ibm.ibm_zos_core.zos_tso_command:
+      commands:
+        - "LISTUSER {{ userid }}" 
+    register: user_info
+
+  - name: Show raw LISTUSER output
+    debug:
+      var: user_info
+
+  - name: Parse LISTUSER output to structured YAML object
+    set_fact:
+      user_yaml: "{{ (user_info.output[0].content) | racf_listuser_content_to_obj }}"
+    
+  - name: Show parsed LISTUSER output
+    debug:
+      var: user_yaml
+
+  - name: Show group memberships
+    debug:
+      msg: "{{ item.group }}"
+    loop: "{{ user_yaml.connects | list }}"
+
+  - name: Initialize remove commands list
+    ansible.builtin.set_fact:
+      remove_commands: []
+
+  - name: Build REMOVE commands
+    ansible.builtin.set_fact:
+      remove_commands: "{{ remove_commands + ['REMOVE ' ~ userid ~ ' GROUP(' ~ item.group ~ ')'] }}"
+    loop: "{{ user_yaml.connects | default([]) }}"
+
+  - name: Show REMOVE commands
+    ansible.builtin.debug:
+      var: remove_commands
+

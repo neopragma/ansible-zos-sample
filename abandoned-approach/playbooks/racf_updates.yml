@@ -39,9 +39,14 @@
   environment: "{{ environment_vars }}"
 
   tasks:
+
     - name: Preamble 
       include_role:
         name: racf_preamble
+
+    - name: Apply RACF User definitions 
+      ansible.builtin.include_role:
+        name: process_users
 
     - name: Apply RACF Group definitions
       ansible.builtin.include_role:

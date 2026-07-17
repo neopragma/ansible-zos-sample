@@ -1,0 +1,28 @@
+---
+"user_profile": {
+    "connects": [
+        {
+            "auth": "USE",
+            "connect_owner": "IBMUSER",
+            "connects": null,
+            "group": "PLATENG",
+            "last_connect": null,
+            "uacc": null
+        }
+    ],
+    "user": {
+        "attributes": [
+            "NONE",
+        ],
+        "category_authorization": null,
+        "default_group": "PLATENG",
+        "logon_allowed_header": "LOGON ALLOWED   (DAYS)          (TIME)",
+        "name": "JOHN DOE",
+        "owner": "IBMUSER",
+        "resume_date": "NONE",
+        "revoke_date": "NONE",
+        "security_label": "NONE",
+        "security_level": "NONE",
+        "userid": "PLAT01"
+    }
+}

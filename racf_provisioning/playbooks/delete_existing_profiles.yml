@@ -1,0 +1,19 @@
+# -----------------------------------------------------------------------------
+# Role: delete_existing_profiles    
+#
+# Delete RACF profiles corresponding to those we are configuring from the
+# managed node.
+# -----------------------------------------------------------------------------
+---
+- name: Delete existing RACF profiles that correspond to the ones we will create
+  hosts: "{{ apply_to }}"
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: placeholder
+      ansible.builtin.debug:
+        msg: placeholder
+

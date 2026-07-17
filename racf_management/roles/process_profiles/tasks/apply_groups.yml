@@ -1,0 +1,17 @@
+# ------------------------------------------------------------
+# Tasks: apply_groups
+#
+# Submit TSO commands to define RACF group profiles to the
+# managed nodes.
+# ------------------------------------------------------------
+
+- name: Convert dict of file paths to list
+  set_fact:
+    file_list: "{{ profile_files | dict2items }}"
+
+- name: Include per-file tasks
+  include_tasks: apply_group_profile.yml
+  vars:
+    file_path: "{{ item.path }}"
+  loop: "{{ file_list }}"
+

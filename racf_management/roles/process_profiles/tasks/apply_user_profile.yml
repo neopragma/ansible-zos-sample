@@ -1,0 +1,81 @@
+# ------------------------------------------------------------
+# Role: apply_user_profile 
+#
+# Apply changes for a single RACF userid.
+# This is a brute-force replacement of the RACF user profile
+# with profile values from our source repository. There is
+# no attempt to interleave new options with existing ones.
+#
+# To delete the RACF profile for a user, we must first 
+# remove that userid from any groups to which it may be
+# connected. Then we can delete the user profile. 
+# -----------------------------------------------------------
+  
+- name: Load controller's user profile data into variable
+  ansible.builtin.set_fact:
+    profile_data: "{{ lookup('ansible.builtin.file', file_path) | from_yaml }}"
+
+- name: Show user profile data on controller
+  debug:
+    var: profile_data
+  when: debug | default(false) | bool   
+
+- name: Grab userid for future use
+  set_fact:
+    racf_userid: "{{ profile_data.user_profile.user.userid }}"
+
+- name: Obtain RACF user definition from z/OS managed nodes
+  ibm.ibm_zos_core.zos_tso_command:
+    commands:
+      - "LISTUSER {{ racf_userid }}"
+  register: user_info
+
+- name: Show raw LISTUSER output
+  debug:
+    var: user_info
+  when: debug | default(false) | bool  
+
+- name: Parse LISTUSER output to structured YAML object
+  set_fact:
+    user_yaml: "{{ (user_info.output[0].content) | racf_listuser_content_to_obj }}"
+
+- name: Show parsed LISTUSER output
+  debug:
+    var: user_yaml
+  when: debug | default(false) | bool  
+
+- name: Show group memberships for this user profile
+  debug:
+    msg: "{{ group_item.group }}"
+  loop: "{{ user_yaml.connects | list }}"
+  loop_control:
+    loop_var: group_item
+  when: debug | default(false) | bool  
+
+- name: Initialize RACF commands list
+  ansible.builtin.set_fact:
+    racf_commands: []
+
+- name: Build REMOVE commands for the user's group connections
+  ansible.builtin.set_fact:
+    racf_commands: "{{ racf_commands + ['REMOVE ' ~ racf_userid ~ ' GROUP(' ~ build_item.group ~ ')'] }}"
+  loop: "{{ user_yaml.connects | default([]) }}"
+  loop_control:
+    loop_var: build_item
+
+- name: Build DELUSER command for the user
+  ansible.builtin.set_fact:
+    racf_commands: "{{ racf_commands + ['DELUSER ' ~ racf_userid] }}"
+
+- name: Show generated RACF commands
+  ansible.builtin.debug:
+    var: racf_commands
+  when: debug | default(false) | bool or dry_run | default(false) | bool  
+
+#- name: Apply updates to node {{ apply_to }}
+#  include_role:
+#    name: submit_tso_commands
+#  vars:
+#    tso_commands: "{{ racf_commands }}"
+
+

@@ -1,0 +1,16 @@
+# ------------------------------------------------------------
+# Tasks: fail_play_if_command_failed
+#
+# Write failure message to the audit log file and fail the play.
+# ------------------------------------------------------------
+
+- name: Log the failure
+  ansible.builtin.include_role:
+    name: write_log
+  vars:
+    severity: error
+    message: "Ending the play due to RACF command failures."
+
+- name: Fail the play
+  ansible.builtin.fail:
+    msg: "One or more commands failed. See {{ logfile }} for details."

@@ -1,0 +1,88 @@
+# ------------------------------------------------------------
+# Role: process_group 
+#
+# Apply changes for a single RACF group.
+# -----------------------------------------------------------
+
+- name: Obtain RACF group definition
+  ibm.ibm_zos_core.zos_tso_command:
+    commands:
+      - "LISTGRP {{ desired_group.name }}"
+  register: group_info
+  failed_when: false
+  changed_when: false
+
+- name: Show LISTGRP output
+  ansible.builtin.debug:
+    var: group_info
+  when: debug | default(false) | bool
+
+- name: Build current_group dictionary
+  ansible.builtin.set_fact:
+    current_group: >-
+      {{
+        group_info.output[0].content
+        | parse_listgrp(desired_group.name)
+      }}
+
+- name: Show current group
+  ansible.builtin.debug:
+    var: current_group
+  when: debug | default(false) | bool
+
+- name: Show desired group
+  ansible.builtin.debug:
+    var: desired_group
+  when: debug | default(false) | bool
+
+# ----------
+# compare.py has shown flakey behavior during development.
+# Sometimes the filter is not loaded due to an underlying
+# problem that occurs silently.
+# These two tasks may help isolate the problem if it recurs.
+#- name: Show filter path
+#  ansible.builtin.debug:
+#    msg: "{{ lookup('config', 'DEFAULT_FILTER_PLUGIN_PATH') }}"
+    
+#- name: Test compare_group filter availability
+#  ansible.builtin.debug:
+#    msg: "{{ {} | compare_group({}) }}"
+# ----------
+
+- name: Build reconciliation plan
+  ansible.builtin.set_fact:
+    plan: "{{ desired_group | compare_group(current_group) }}"
+
+- name: Show reconciliation plan
+  ansible.builtin.debug:
+    var: plan
+  when: debug | default(false) | bool
+
+- name: Build RACF command objects
+  ansible.builtin.set_fact:
+    racf_commands: "{{ plan | build_commands }}"
+
+- name: Show command objects
+  ansible.builtin.debug:
+    var: racf_commands
+  when: (debug | default(false) | bool) or (dry_run | default(false) | bool)
+
+- name: Log the end of a dry run
+  include_role:
+    name: write_log
+  vars:
+    severity: info
+    message: "**** Ending dry run. No modifications were made to managed nodes. ****"
+  when: dry_run | default(false) | bool
+
+- name: End play if this is a dry run 
+  meta: end_play
+  when: dry_run | default(false) | bool
+
+- name: Apply updates to node {{ apply_to }}
+  include_role:
+    name: submit_tso_commands
+  vars:
+    tso_commands: "{{ racf_commands }}"
+
+

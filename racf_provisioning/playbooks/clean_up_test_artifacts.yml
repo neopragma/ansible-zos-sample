@@ -1,0 +1,18 @@
+# -----------------------------------------------------------------------------
+# Role: clean_up_test_artifacts    
+#
+# Remove any leftover test artifacts from the managed node.
+# -----------------------------------------------------------------------------
+---
+- name: Remove any leftover test artifacts from the managed node.
+  hosts: "{{ apply_to }}"
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: placeholder
+      ansible.builtin.debug:
+        msg: placeholder
+

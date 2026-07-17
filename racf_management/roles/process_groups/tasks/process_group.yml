@@ -4,22 +4,35 @@
 # Apply changes for a single RACF group.
 # -----------------------------------------------------------
 
-- name: Obtain RACF group definition
+- name: See if group exists on the managed node
   ibm.ibm_zos_core.zos_tso_command:
     commands:
-      - "LISTGRP {{ group_definition.name }}"
+      - "LISTGRP {{ group_profile.group }}"
   register: group_info
   failed_when: false
   changed_when: false
 
-- name: Build current_group dictionary
-  ansible.builtin.set_fact:
-    current_group: >-
-      {{
-        group_info.output[0].content
-        | parse_listgrp(group_definition.name)
-      }}
+- name: Display LISTGRO output 
+  ansible.builtin.debug:
+    var: group_info
+  when: debug | default(false) | bool  
 
-- ansible.builtin.debug:
-    var: current_group
-  when: debug | default(false) | bool
+- name: Log the end of a dry run
+  include_role:
+    name: write_log
+  vars:
+    severity: info
+    message: "**** Ending dry run. No modifications were made to managed nodes. ****"
+  when: dry_run | default(false) | bool
+
+- name: End play if this is a dry run 
+  meta: end_play
+  when: dry_run | default(false) | bool
+
+- name: Apply updates to node {{ apply_to }}
+  include_role:
+    name: submit_tso_commands
+  vars:
+    tso_commands: "{{ racf_commands }}"
+
+

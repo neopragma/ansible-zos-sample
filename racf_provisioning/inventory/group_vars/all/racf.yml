@@ -49,6 +49,6 @@ loglevel: info
 # 
 # Relative paths are interpreted relative to [project_root]/playbooks.
 
-racf_profiles: "{{ playbook_dir }}/../racf_profiles"
+racf_profiles: "{{ project_root }}/racf_profiles"
 
 

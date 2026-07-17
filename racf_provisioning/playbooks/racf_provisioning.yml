@@ -1,0 +1,45 @@
+# -----------------------------------------------------------------------------
+# Playbook: racf_provisioning
+#
+# Applies changes to one or more z/OS managed nodes based on declarative 
+# definitions of RACF profiles for userids, groups, and resources. 
+#
+# Supports an Infrastructure as Code approach to managing RACF definitions. 
+# Existing profiles are deleted and entirely replaced by profiles generated 
+# from RACF profile definitions stored on the Ansble control node. It does not 
+# merge new values with existing ones.
+#
+# Variables. Define in inventory or pass with -e option.
+#
+# "apply_to=hostname"              The host name defined in inventory that will 
+#                                  be provsioned in this run.
+#                                   
+# "test_host=hostname"             The host name defined in inventory for
+#                                  testing RACF settings (same host as
+#                                  apply_to but using a different connection,
+#                                  to allow login with a test userid.
+#                                   
+# "logfile=path"                   Path to RACF audit log file relative to
+#                                  project root.
+#
+# "loglevel=info|warn|error|none"  Minimum severity to log.
+#
+# "initlog=true|false"             Initialize (delete) the local RACF audit
+#                                  log file at the beginning of this run.
+#
+# "debug=true|false"               Enable Ansible debug tasks
+#                                  Default: false
+#
+# "dry_run=true|false"             List significant variable
+#                                  values but do not apply
+#                                  maintenance to the z/OS nodes.                                                                   
+#                                  Default: false
+#
+# "racf_profiles=path"             Path to RACF profile definitions.
+# ------------------------------------------------------------
+---
+- import_playbook: verify_settings.yml
+- import_playbook: delete_existing_profiles.yml
+- import_playbook: add_profiles.yml
+- import_playbook: verify_profiles.yml
+- import_playbook: clean_up_test_artifacts.yml

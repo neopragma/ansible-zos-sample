@@ -1,0 +1,73 @@
+# -----------------------------------------------------------------------------
+# Role: verify_settings
+#
+# Ensure certain variables are set before proceeding with the run.
+#
+# 1. If this is a dry run (-e "dry_run=true") display the
+#    values of certain Ansible variables and environment
+#    variables and show where to look for documentation.
+#
+# 2. If the RACF audit log is to be initialized prior to
+#    starting this run (-e "initlog=true"), delete the
+#    log file on localhost.
+#
+# 3. If this is a dry run, log the start a dry run.
+#
+# 4. If this is not a dry run, log the start of a normal run.     
+#
+# 5. Ensure variable racf_profiles points to an existing directory.  
+# -----------------------------------------------------------------------------
+---
+- name: RACF provisioning
+  hosts: "{{ apply_to }}"
+#  hosts: zoslab
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  environment: "{{ environment_vars }}"
+
+  tasks:
+  - name: dry_run - Show environment values relevant to this playbook
+    ansible.builtin.debug:
+      msg:
+        - "initlog: {{ initlog }}"
+        - "logfile: {{ logfile }}"
+        - "loglevel: {{ loglevel }}"
+        - "racf_profiles: {{ racf_profiles }}"
+        - "apply_to: {{ apply_to }}"
+        - "all defined hosts: {{ groups['all']  }}"
+        - "environment variables: {{ environment_vars }}"
+        - "Documentation: See inventory/group_vars/all/racf.yml"
+    when: dry_run | default(false) | bool
+
+  - name: Ensure variable racf_profiles is set and points to a directory on localhost 
+    include_role:
+      name: check_racf_profiles_path 
+
+  - name: Clear (delete) the local RACF audit log
+    ansible.builtin.file:
+      path: "{{ logfile }}"
+      state: absent
+    delegate_to: localhost
+    run_once: true
+
+  - name: Log dry_run start
+    include_role:
+      name: write_log
+    vars:
+      severity: info
+      message: "**** Beginning dry run. No modifications will be made to managed nodes. ****"
+    when: dry_run | default(false) | bool  
+
+  - name: Log the start of this process  
+    ansible.builtin.include_role:
+      name: write_log
+    vars:
+      override_level: true
+      severity: info
+      message: "{{ log_message }}"
+    loop:
+      - "Starting {{ ansible_play_name }} for host {{ apply_to }}"
+      - "Using profile definitions in directory {{ racf_profiles }}"  
+    loop_control:
+      loop_var: log_message

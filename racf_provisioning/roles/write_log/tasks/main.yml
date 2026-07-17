@@ -1,11 +1,11 @@
-# ------------------------------------------------------------
-# Role: Write a log record
+# -----------------------------------------------------------------------
+# Role: write_log
 #
 # Write a record to the local RACF audit log.
 #
 # This depends on variables logfile and loglevel being set.
-# ------------------------------------------------------------
-
+# ----------------------------------------------------------------------
+---
 - name: Write to local RACF audit log
   vars:
     level_map:

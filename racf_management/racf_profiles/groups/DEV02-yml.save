@@ -1,0 +1,15 @@
+name: DEV02
+
+attributes:
+  owner: IBMUSER
+  superior: SYS1
+  installation_data: SOFTWARE DEVELOPMENT TEAM 4    
+  model_dataset: ""          # Value of "" results in NOMODEL
+  termuacc: false            # Value of false results in NOTERMACC
+
+connections:
+  - userid: USER55
+    authority: USE
+   
+  - userid: USER56 
+    authority: USE

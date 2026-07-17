@@ -1,0 +1,23 @@
+# ------------------------------------------------------------
+# Tasks: submit_one_command
+#
+# This is called in a loop by submit_tso_commands so that we
+# can perform multiple actions when a command fails.
+# ------------------------------------------------------------
+- name: Initialize command results
+  ansible.builtin.set_fact:
+    command_results: []
+
+- name: Submit each RACF command object
+  ansible.builtin.include_tasks: submit_one_command.yml
+  loop: "{{ tso_commands }}"
+  loop_control:
+    loop_var: tso_command
+
+- name: Fail the play if any RACF command failed 
+  ansible.builtin.include_tasks: fail_play_if_command_failed.yml
+  when: >
+    command_results
+      | selectattr('rc', 'ne', 0)
+      | list
+      | length > 0

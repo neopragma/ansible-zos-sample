@@ -1,0 +1,55 @@
+# ------------------------------------------------------------
+# Tasks: check_racf_profiles_path
+#
+# Verify that Ansible variable racf_profiles is set and 
+# points to an existing directory on localhost.
+# ------------------------------------------------------------
+
+- name: Set exists flag based on whether racf_profiles is set
+  set_fact:
+    racf_profiles_is_set: "{{ (racf_profiles | default('')) != '' }}"
+
+- name: Inform user if racf_profiles is not set
+  ansible.builtin.debug:
+    msg: "Please set variable racf_profiles to a path to RACF profile definitions and try again."
+  when: "{{ not racf_profiles_is_set }}"
+
+- name: Write error message to audit log if racf_profiles is not set
+  include_role:
+    name: write_log
+  vars:
+    severity: error
+    message: "Please set variable racf_profiles to a path to RACF profile definitions and try again."
+  when: "{{ not racf_profiles_is_set }}"
+
+- name: End playbook if racf_profiles is not set 
+  ansible.builtin.fail:
+    msg: "Variable racf_profiles is not set. It must point to a directory containing RACF profile definitions."  
+  when: "{{ not racf_profiles_is_set }}"
+
+- name: Check directory exists
+  stat:
+    path: "{{ racf_profiles }}"
+  register: racf_profiles_directory
+  delegate_to: localhost
+
+- name: Inform user if racf_profiles is not a directory
+  ansible.builtin.debug:
+    msg: "{{ racf_profiles }} does not point to a valid directory on localhost"
+  when: "{{ racf_profiles_directory.isdir is defined and not racf_profiles_directory.stat.isdir }}"
+
+- name: Write error message to audit log if racf_profiles is not a directory
+  include_role:
+    name: write_log
+  vars:
+    severity: error
+    msg: "{{ racf_profiles }} does not point to a valid directory on localhost"
+  when: "{{ racf_profiles_directory.isdir is defined and not racf_profiles_directory.stat.isdir }}"
+  
+- name: End playbook if racf_profiles is not a directory
+  ansible.builtin.fail:
+    msg: "{{ racf_profiles }} is not a directory on localhost"  
+  when: "{{ racf_profiles_directory.isdir is defined and not racf_profiles_directory.stat.isdir }}"
+
+
+

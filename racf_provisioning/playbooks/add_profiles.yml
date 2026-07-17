@@ -1,0 +1,18 @@
+# -----------------------------------------------------------------------------
+# Role: add_profiles    
+#
+# Add RACF profiles based on the definitions found in directory racf_profiles.
+# -----------------------------------------------------------------------------
+---
+- name: Add RACF profiles based on the definitions found in directory racf_profiles
+  hosts: "{{ apply_to }}"
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: placeholder
+      ansible.builtin.debug:
+        msg: placeholder
+

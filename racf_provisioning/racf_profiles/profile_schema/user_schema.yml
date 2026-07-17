@@ -1,0 +1,131 @@
+---
+# -----------------------------------------------------------------------------
+# RACF user definition.
+#
+# This file models a desired RACF user state. Playbooks use this information
+# to generate RACF TSO commands ADDUSER and ALTUSER when provisioning z/OS
+# managed nodes.
+#
+# Playbooks expect to find files like this under the directory specified in
+# variable "racf_profiles", e.g. "{{ racf_profiles }}/users".
+#
+# The filename should be the same as the userid, e.g.
+# - prod_profiles/users/user01.yml    (racf_profiles=prod_profiles)
+# - test_profiles/users/user52.yml    (racf_profiles=test_profiles)
+# - local_sandbox/users/user20.yml    (racf_profiles=local_sandbox)
+#
+# This sample includes every currently supported attribute. Actual user
+# profiles normally omit attributes that are not managed.
+#
+# Copy this or use it as a guide to prepare userid.yml files that will be
+# processed in playbooks. Omit attributes not relevant to your user definition.
+#
+# Resources:
+# - https://www.ibm.com/docs/en/zos/3.1.0?topic=users-user-attributes
+# -----------------------------------------------------------------------------
+
+racf_user:
+  meta:
+
+    object_type: user
+    schema_version: "0.1.0"
+    zos_version: "3.1.0"
+
+  state: present                     # present | absent
+
+  content:
+
+    base:
+      userid: "ibmuser"
+      name: "User Name"
+      owner: "SYS1"
+      default_group: "SYS1"
+      connect_groups:
+        - group: "SYS1"
+          authority: use             # use | connect | join | create
+        - group: "OPERATIONS"
+          authority: connect         # use | connect | join | create
+          owner: "SYS1"
+          connect_attributes:
+            operations: false
+            special: false
+            auditor: false
+      password:
+        source: generated            # generated | vault | external
+        expired: false
+        no_password: false
+      revoke:
+        revoked: false
+        resume_date: null
+      attributes:
+        special: false
+        operations: false
+        auditor: false
+        revoker: false
+        protected: false
+        restricted: false
+        trusted: false
+        privileged: false
+      installation:
+        installation_data: null
+        model: null
+      security:
+        security_label: null
+        security_level: null
+        categories: []
+      audit:
+        cmdaudit: false
+        operaudit: false
+        xaudit: false
+      identity:
+        kerberos_encryption: null
+        distributed_identity: null
+
+    omvs:
+      uid: 1000
+      home: "/u/ibmuser"
+      program: "/bin/sh"
+      cpu_time_max: null
+      assize_max: null
+      fileproc_max: null
+      mmap_area_max: null
+      threads_max: null
+      proc_user_max: null
+      shared_memory_max: null
+      region_size_max: null
+      ipc_message_queue_max: null
+      ipc_semaphore_max: null
+      ipc_shared_memory_max: null
+      auto_uid: false
+      auto_home: false
+
+    tso:
+      account_number: null
+      procedure: "IKJACCNT"
+      command: null
+      destination: null
+      hold_class: null
+      job_class: null
+      message_class: null
+      size_max: null
+      region_size: null
+      unit: null
+      user_data: null
+      logon:
+        reconnect: false
+        logon_allowed: true
+      performance:
+        priority: null
+        max_region_size: null
+
+#    cics: null
+#    csdata: null
+#    dce: null
+#    kerb: null
+#    language: null
+#    lnotes: null
+#    nds: null
+#    netview: null
+#    operparm: null
+#    proxy: null
+#    workattr: null

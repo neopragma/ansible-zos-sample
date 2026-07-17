@@ -2,17 +2,17 @@
 # Role: process_groups
 #
 # Apply changes to RACF Groups based on declarative
-# profile definitions managed under version control.
+# definitions managed under version control.
 # ------------------------------------------------------------
 
-- name: Find group profile files
+- name: Find group definition files
   ansible.builtin.find:
-    paths: "{{ racf_profiles }}/groups"
+    paths: "{{ racf_definitions }}/groups"
     patterns: "*.yml"
   delegate_to: localhost
   register: group_files
 
-- name: Show group profile files
+- name: Show group definition files
   ansible.builtin.debug:
     var: group_files
   when: debug | default(false) | bool  
@@ -26,13 +26,13 @@
     desired_group: "{{ lookup('file', group_file.path) | from_yaml }}"
   when: group_files.files | length > 0
 
-- name: No group profiles found 
-  # This means there are no group profiles to apply to the managed node
+- name: No group definitions found 
+  # This means there are no group definitions to apply to the managed node
   include_role:
       name: write_log
   vars:    
     severity: error
-    message: "No group profile files were found at {{ racf_profiles }}/groups."
+    message: "No group definition files were found at {{ racf_definitions }}/groups."
   ignore_errors: true
   when: group_files.files | length == 0
 

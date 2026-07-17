@@ -1,0 +1,2 @@
+# inventory/group_vars/all/project.yml
+project_root: "{{ lookup('env', 'PWD') }}"

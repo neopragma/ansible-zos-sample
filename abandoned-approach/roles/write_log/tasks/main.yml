@@ -21,4 +21,5 @@
     create: true
   delegate_to: localhost
   when:
-    - (message | default("") | trim != "" and level_map[severity] >= level_map[loglevel]) or (override_level | default(false) | bool)
+    - message | default("") | trim != ""
+    - level_map[severity] >= level_map[loglevel]

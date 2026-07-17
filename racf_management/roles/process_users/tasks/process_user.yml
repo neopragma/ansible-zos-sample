@@ -1,0 +1,58 @@
+# ------------------------------------------------------------
+# Role: process_userid 
+#
+# Apply changes for a single RACF userid.
+# -----------------------------------------------------------
+
+  - name: Show userid being processed (testing only)
+    debug:
+      var: desired_user.userid
+
+
+  - name: Obtain RACF user definition
+    ibm.ibm_zos_core.zos_tso_command:
+      commands:
+        - "LISTUSER {{ desired_user.userid }}"
+    register: user_info
+
+  - name: Show raw LISTUSER output
+    debug:
+      var: user_info
+    when: debug | default(false) | bool  
+
+  - name: Parse LISTUSER output to structured YAML object
+    set_fact:
+      user_yaml: "{{ (user_info.output[0].content) | racf_listuser_content_to_obj }}"
+
+  - name: Show parsed LISTUSER output
+    debug:
+      var: user_yaml
+    when: debug | default(false) | bool  
+
+  - name: Show group memberships
+    debug:
+      msg: "{{ item.group }}"
+    loop: "{{ user_yaml.connects | list }}"
+    when: debug | default(false) | bool  
+
+  - name: Initialize remove commands list
+    ansible.builtin.set_fact:
+      racf_commands: []
+
+  - name: Build REMOVE commands
+    ansible.builtin.set_fact:
+      racf_commands: "{{ racf_commands + ['REMOVE ' ~ userid ~ ' GROUP(' ~ item.group ~ ')'] }}"
+    loop: "{{ user_yaml.connects | default([]) }}"
+
+  - name: Show REMOVE commands
+    ansible.builtin.debug:
+      var: remove_commands
+    when: debug | default(false) | bool  
+
+  - name: Apply updates to node {{ apply_to }}
+    include_role:
+      name: submit_tso_commands
+    vars:
+      tso_commands: "{{ racf_commands }}"
+
+

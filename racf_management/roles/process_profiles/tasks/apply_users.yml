@@ -1,0 +1,22 @@
+# ------------------------------------------------------------
+# Tasks: apply_users
+#
+# Submit TSO commands to define RACF user profiles to the
+# managed nodes.
+# ------------------------------------------------------------
+
+- name: Debug keys in file_list
+  debug:
+    msg: "{{ item.key }}"
+  loop: "{{ profile_files | dict2items }}"
+  when: debug | default(false) | bool
+
+- set_fact:
+    file_paths: "{{ profile_files.files | default([]) }}"
+
+- name: Include per-file tasks
+  include_tasks: apply_user_profile.yml
+  vars:
+    file_path: "{{ item.path }}"
+  loop: "{{ file_paths }}"
+

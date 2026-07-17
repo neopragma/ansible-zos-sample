@@ -1,0 +1,174 @@
+
+PLAY [Update RACF Security Definitions] ****************************************
+
+TASK [Preamble] ****************************************************************
+included: racf_preamble for zoslab
+
+TASK [racf_preamble : Dry run] *************************************************
+ok: [zoslab] => {
+    "msg": [
+        "initlog: True",
+        "logfile: ../logs/racf_audit.log",
+        "loglevel: info",
+        "racf_definitions: /home/ubuntu/ansible-zos/racf_management/playbooks/../racf_definitions",
+        "apply_to: zoslab",
+        "all defined hosts: ['zoslab']",
+        "environment variables: {'_BPXK_AUTOCVT': 'ON', 'ZOAU_HOME': '/usr/lpp/IBM/zoautil', 'PYTHONPATH': '/usr/lpp/IBM/zoautil/lib/3.11', 'LIBPATH': '/usr/lpp/IBM/zoautil/lib:/usr/lpp/IBM/cyp/v3r11/pyz/lib:/lib:/usr/lib:.', 'PATH': '/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/cyp/v3r11/pyz/bin:/bin:/var/bin', '_CEE_RUNOPTS': 'FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)', '_TAG_REDIR_ERR': 'txt', '_TAG_REDIR_IN': 'txt', '_TAG_REDIR_OUT': 'txt', 'LANG': 'C', 'PYTHONSTDINENCODING': 'cp1047', 'PYTHONIOENCODING': 'utf-8'}",
+        "Documentation: See inventory/group_vars/all/racf.yml"
+    ]
+}
+
+TASK [Initialize RACF audit log] ***********************************************
+included: initialize_log for zoslab
+
+TASK [initialize_log : Clear (delete) the local RACF audit log] ****************
+changed: [zoslab -> localhost]
+
+TASK [Log the start of a dry run] **********************************************
+included: write_log for zoslab
+
+TASK [write_log : Write to local RACF audit log] *******************************
+changed: [zoslab -> localhost]
+
+TASK [Log the start of this process] *******************************************
+included: write_log for zoslab
+
+TASK [write_log : Write to local RACF audit log] *******************************
+changed: [zoslab -> localhost]
+
+TASK [Apply RACF Group definitions] ********************************************
+included: process_groups for zoslab
+
+TASK [process_groups : Find group definition files] ****************************
+ok: [zoslab -> localhost]
+
+TASK [process_groups : Show group definition files] ****************************
+ok: [zoslab] => {
+    "group_files": {
+        "changed": false,
+        "examined": 3,
+        "failed": false,
+        "files": [
+            {
+                "atime": 1784063898.288422,
+                "blocks": 8,
+                "ctime": 1784063786.643329,
+                "dev": 66305,
+                "disk_usage_bytes": 4096,
+                "gid": 1000,
+                "gr_name": "ubuntu",
+                "inode": 351536,
+                "isblk": false,
+                "ischr": false,
+                "isdir": false,
+                "isfifo": false,
+                "isgid": false,
+                "islnk": false,
+                "isreg": true,
+                "issock": false,
+                "isuid": false,
+                "mode": "0664",
+                "mtime": 1784063786.6405933,
+                "nlink": 1,
+                "path": "/home/ubuntu/ansible-zos/racf_management/racf_definitions/groups/DEV01.yml",
+                "pw_name": "ubuntu",
+                "rgrp": true,
+                "roth": true,
+                "rusr": true,
+                "size": 376,
+                "uid": 1000,
+                "wgrp": true,
+                "woth": false,
+                "wusr": true,
+                "xgrp": false,
+                "xoth": false,
+                "xusr": false
+            }
+        ],
+        "matched": 1,
+        "msg": "All paths examined",
+        "skipped_paths": {}
+    }
+}
+
+TASK [process_groups : Process each group] *************************************
+included: /home/ubuntu/ansible-zos/racf_management/roles/process_groups/tasks/process_group.yml for zoslab => (item={'path': '/home/ubuntu/ansible-zos/racf_management/racf_definitions/groups/DEV01.yml', 'mode': '0664', 'isdir': False, 'ischr': False, 'isblk': False, 'isreg': True, 'isfifo': False, 'islnk': False, 'issock': False, 'uid': 1000, 'gid': 1000, 'size': 376, 'inode': 351536, 'dev': 66305, 'nlink': 1, 'atime': 1784063898.288422, 'mtime': 1784063786.6405933, 'ctime': 1784063786.643329, 'gr_name': 'ubuntu', 'pw_name': 'ubuntu', 'wusr': True, 'rusr': True, 'xusr': False, 'wgrp': True, 'rgrp': True, 'xgrp': False, 'woth': False, 'roth': True, 'xoth': False, 'isuid': False, 'isgid': False, 'blocks': 8, 'disk_usage_bytes': 4096})
+
+TASK [process_groups : Obtain RACF group definition] ***************************
+ok: [zoslab]
+
+TASK [process_groups : Show LISTGRP output] ************************************
+ok: [zoslab] => {
+    "group_info": {
+        "changed": false,
+        "changed_when_result": false,
+        "failed": false,
+        "failed_when_result": false,
+        "max_rc": 0,
+        "output": [
+            {
+                "command": "LISTGRP DEV01",
+                "content": [
+                    "INFORMATION FOR GROUP DEV01   ",
+                    "    SUPERIOR GROUP=SYS1         OWNER=IBMUSER     CREATED=26.195",
+                    "    INSTALLATION DATA=SOFTWARE DEVELOPMENT TEAM 3                  ",
+                    "    NO MODEL DATA SET   ",
+                    "    TERMUACC  ",
+                    "    NO SUBGROUPS",
+                    "    USER(S)=      ACCESS=      ACCESS COUNT=      UNIVERSAL ACCESS=",
+                    "      USER01        USE           000000               NONE        ",
+                    "         CONNECT ATTRIBUTES=NONE                                              ",
+                    "         REVOKE DATE=NONE                 RESUME DATE=NONE              ",
+                    "      PLAT01        JOIN          000000               NONE        ",
+                    "         CONNECT ATTRIBUTES=NONE                                              ",
+                    "         REVOKE DATE=NONE                 RESUME DATE=NONE              ",
+                    "      IBMUSER       USE           000000               NONE        ",
+                    "         CONNECT ATTRIBUTES=NONE                                              ",
+                    "         REVOKE DATE=NONE                 RESUME DATE=NONE              ",
+                    ""
+                ],
+                "failed": false,
+                "lines": 17,
+                "rc": 0,
+                "stderr": ""
+            }
+        ]
+    }
+}
+
+TASK [process_groups : Build current_group dictionary] *************************
+[ERROR]: Task failed: Finalization of task args for 'ansible.builtin.set_fact' failed: Error while resolving value for 'current_group': The filter plugin 'parse_listgrp' failed: name 'parts' is not defined
+
+Task failed.
+Origin: /home/ubuntu/ansible-zos/racf_management/roles/process_groups/tasks/process_group.yml:20:3
+
+18   when: debug | default(false) | bool
+19
+20 - name: Build current_group dictionary
+     ^ column 3
+
+<<< caused by >>>
+
+Finalization of task args for 'ansible.builtin.set_fact' failed.
+Origin: /home/ubuntu/ansible-zos/racf_management/roles/process_groups/tasks/process_group.yml:21:3
+
+19
+20 - name: Build current_group dictionary
+21   ansible.builtin.set_fact:
+     ^ column 3
+
+<<< caused by >>>
+
+Error while resolving value for 'current_group': The filter plugin 'parse_listgrp' failed: name 'parts' is not defined
+Origin: /home/ubuntu/ansible-zos/racf_management/roles/process_groups/tasks/process_group.yml:22:20
+
+20 - name: Build current_group dictionary
+21   ansible.builtin.set_fact:
+22     current_group: >-
+                      ^ column 20
+
+fatal: [zoslab]: FAILED! => {"changed": false, "msg": "Task failed: Finalization of task args for 'ansible.builtin.set_fact' failed: Error while resolving value for 'current_group': The filter plugin 'parse_listgrp' failed: name 'parts' is not defined"}
+
+PLAY RECAP *********************************************************************
+zoslab                     : ok=14   changed=3    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0   
+
