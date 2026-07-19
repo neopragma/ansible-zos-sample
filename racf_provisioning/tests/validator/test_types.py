@@ -60,3 +60,19 @@ def test_integer_rejects_string(valid_user):
         result,
         "content.omvs.uid",
     )
+
+def test_section_rejects_non_object_value():
+
+    result = validate(
+        {
+            "content": "not-an-object"
+        },
+        USER_SCHEMA,
+    )
+
+    assert_invalid(result)
+
+    assert_has_error(
+        result,
+        "content",
+    )   

@@ -3,7 +3,35 @@ Shared pytest fixtures.
 """
 
 import pytest
+import pytest
 
+from filter_plugins.racf.schema.common import (
+    Field,
+    Section,
+    ValueType,
+)
+
+@pytest.fixture
+def list_schema():
+    return Section(
+        fields={
+            "groups": Field(
+                type=ValueType.LIST,
+                required=True,
+            )
+        }
+    )
+
+@pytest.fixture
+def object_schema():
+    return Section(
+        fields={
+            "metadata": Field(
+                type=ValueType.OBJECT,
+                required=True,
+            )
+        }
+    )
 
 @pytest.fixture
 def valid_user():
@@ -27,3 +55,29 @@ def valid_user():
             }
         },
     }
+
+
+
+
+@pytest.fixture
+def list_schema():
+    return Section(
+        fields={
+            "groups": Field(
+                type=ValueType.LIST,
+                required=True,
+            )
+        }
+    )
+
+
+@pytest.fixture
+def object_schema():
+    return Section(
+        fields={
+            "metadata": Field(
+                type=ValueType.OBJECT,
+                required=True,
+            )
+        }
+    )    

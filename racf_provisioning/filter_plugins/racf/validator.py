@@ -140,91 +140,140 @@ def _validate_field(
     path: list[str],
     errors: list[ValidationError],
 ) -> None:
-    """
-    Validate one field value.
-    """
+
     if value is None:
         return
+
     if field.type == ValueType.STRING:
-        if not isinstance(value, str):
-            errors.append(
-            ValidationError(
-              #  path=_format_path(path),
-                path=_format_path(path),
-                message=f"{_format_path(path)} must be a string"
-            )
-        )
-        return
+        _validate_string(value, path, errors)
 
     elif field.type == ValueType.INTEGER:
-        if not isinstance(value, int):
-            errors.append(
-                ValidationError(
-                    path=_format_path(path),
-                    message=f"{_format_path(path)} must be an integer"
-                )
-            )
-            return
+        _validate_integer(value, field, path, errors)
 
-        if (
-            field.minimum is not None
-            and value < field.minimum
-        ):
-            errors.append(
-                ValidationError(
-                    path=_format_path(path),
-                    message=f"{_format_path(path)} must be >= {field.minimum}"
-                )
-            )
-
-        if (
-            field.maximum is not None
-            and value > field.maximum
-        ):
-            errors.append(
-                ValidationError(
-                    path=_format_path(path),
-                    message=f"{_format_path(path)} must be <= {field.maximum}"
-                )
-            )
     elif field.type == ValueType.BOOLEAN:
-        if not isinstance(value, bool):
-            errors.append(
-            ValidationError(
-                path=_format_path(path),
-                message=f"{_format_path(path)} must be an object"
-            )
-        )
-        return
+        _validate_boolean(value, path, errors)
+
     elif field.type == ValueType.ENUM:
-        if value not in field.choices:
-            errors.append(
-            ValidationError(
-                path=_format_path(path),
-                message=f"{_format_path(path)} must be one of "
-                        f"{field.choices}; received {value!r}"
-            )
-        )
-        return
+        _validate_enum(value, field, path, errors)
+
     elif field.type == ValueType.LIST:
-        if not isinstance(value, list):
-            errors.append(
-            ValidationError(
-                path=_format_path(path),
-                message=f"{_format_path(path)} must be a list"
-            )
-        )
-        return
+        _validate_list(value, path, errors)
+
     elif field.type == ValueType.OBJECT:
-        if not isinstance(value, dict):
-            errors.append(
-            ValidationError(
-                path=_format_path(path),
-                message=f"{_format_path(path)} must be an object"
-            )
+        _validate_object(value, path, errors)
+
+
+def _validate_boolean(
+    value: Any,
+    path: list[str],
+    errors: list[ValidationError],
+) -> None:
+
+    if not isinstance(value, bool):
+        _add_error(
+            errors,
+            path,
+            "must be a boolean",
+        ) 
+
+def _validate_enum(
+    value: Any,
+    field: Field,
+    path: list[str],
+    errors: list[ValidationError],
+) -> None:
+
+    if value not in field.choices:
+        errors.append(
+        ValidationError(
+            path=_format_path(path),
+            message=f"{_format_path(path)} must be one of "
+                    f"{field.choices}; received {value!r}"
+        )
+    )
+
+def _validate_integer(
+    value: Any,
+    field: Field,
+    path: list[str],
+    errors: list[ValidationError],
+) -> None:
+
+    if not isinstance(value, int):
+        _add_error(
+            errors,
+            path,
+            "must be an integer",
         )
         return
 
+    if field.minimum is not None and value < field.minimum:
+        _add_error(
+            errors,
+            path,
+            f"must be >= {field.minimum}",
+        )
+
+    if field.maximum is not None and value > field.maximum:
+        _add_error(
+            errors,
+            path,
+            f"must be <= {field.maximum}",
+        )
+
+def _validate_list(
+    value: Any,
+    path: list[str],
+    errors: list[ValidationError],
+) -> None:
+
+    if not isinstance(value, list):
+        errors.append(
+        ValidationError(
+            path=_format_path(path),
+            message=f"{_format_path(path)} must be a list"
+        )
+    )
+
+def _validate_object(
+    value: Any,
+    path: list[str],
+    errors: list[ValidationError],
+) -> None:
+
+    if not isinstance(value, dict):
+        errors.append(
+        ValidationError(
+            path=_format_path(path),
+            message=f"{_format_path(path)} must be an object"
+            )
+        )
+
+def _validate_string(
+    value: Any,
+    path: list[str],
+    errors: list[ValidationError],
+) -> None:
+
+    if not isinstance(value, str):
+        _add_error(
+            errors,
+            path,
+            "must be a string",
+        )
+
+def _add_error(
+    errors: list[ValidationError],
+    path: list[str],
+    message: str,
+) -> None:
+
+    errors.append(
+        ValidationError(
+            path=_format_path(path),
+            message=message,
+        )
+    )
 
 def _format_path(parts: list[str]) -> str:
     """

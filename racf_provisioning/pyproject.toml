@@ -4,6 +4,10 @@ addopts = [
     "--cov-report=term-missing",
 ]
 
+pythonpath = [
+    ".",
+]
+
 testpaths = [
     "tests",
 ]

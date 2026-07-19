@@ -1,0 +1,5 @@
+pytest>=9
+pytest-cov>=7
+typeguard
+ruff
+mypy
