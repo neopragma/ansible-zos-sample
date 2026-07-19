@@ -1,0 +1,24 @@
+[tool.pytest.ini_options]
+addopts = [
+    "--cov=filter_plugins/racf",
+    "--cov-report=term-missing",
+]
+
+testpaths = [
+    "tests",
+]
+
+[tool.coverage.run]
+source = [
+    "filter_plugins/racf",
+]
+
+omit = [
+    "*/__init__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+]
