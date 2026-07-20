@@ -1,29 +1,19 @@
-from ..operations import (
-    EnsureOMVS,
-    EnsureUser,
-)
+from . import base
+from . import omvs
 from .common import Plan
 
 
 def plan(model):
 
-    userid = model["content"]["base"]["userid"]
+    operations = []
 
-    operations = [
-        EnsureUser(userid=userid),
-    ]
+    operations.extend(
+        base.plan(model)
+    )
 
-    if "omvs" in model["content"]:
-        omvs = model["content"]["omvs"]
-
-        operations.append(
-            EnsureOMVS(
-                userid=userid,
-                uid=omvs["uid"],
-                home=omvs["home"],
-                program=omvs["program"],
-            )
-        )
+    operations.extend(
+        omvs.plan(model)
+    )
 
     return Plan(
         operations=operations,
