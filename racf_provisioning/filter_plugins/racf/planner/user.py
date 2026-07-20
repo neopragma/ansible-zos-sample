@@ -2,6 +2,7 @@ from ..operations import (
     EnsureOMVS,
     EnsureUser,
 )
+from .common import Plan
 
 
 def plan(model):
@@ -24,4 +25,6 @@ def plan(model):
             )
         )
 
-    return operations
+    return Plan(
+        operations=operations,
+    )

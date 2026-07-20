@@ -16,9 +16,13 @@ def test_plan_minimal_user():
         },
     }
 
-    operations = plan(model)
-
-    assert operations == [
+    result = plan(model)
+    assert len(result.operations) == 1
+    assert isinstance(
+        result.operations[0],
+        EnsureUser,
+    )
+    assert result.operations == [
         EnsureUser(
             userid="USER01",
         ),
@@ -38,14 +42,18 @@ def test_plan_user_with_omvs_creates_ensure_omvs():
         }
     }
 
-    operations = plan(model)
-
+    result = plan(model)
+    assert len(result.operations) == 2
+    assert isinstance(
+        result.operations[0],
+        EnsureUser,
+    )
     assert EnsureOMVS(
         userid="USER01",
         uid=12345,
         home="/u/user01",
         program="/bin/sh",
-    ) in operations    
+    ) in result.operations    
 
 def test_plan_user_without_omvs_does_not_create_ensure_omvs():
 
@@ -57,15 +65,19 @@ def test_plan_user_without_omvs_does_not_create_ensure_omvs():
         }
     }
 
-    operations = plan(model)
-
+    result = plan(model)
+    assert len(result.operations) == 1
+    assert isinstance(
+        result.operations[0],
+        EnsureUser,
+    )
     assert EnsureUser(
         userid="USER01",
-    ) in operations
+    ) in result.operations
 
     assert not any(
         isinstance(operation, EnsureOMVS)
-        for operation in operations
+        for operation in result.operations
     )
 
 def test_plan_user_creates_operations_in_dependency_order():
@@ -83,15 +95,19 @@ def test_plan_user_creates_operations_in_dependency_order():
         }
     }
 
-    operations = plan(model)
-
+    result = plan(model)
+    assert len(result.operations) == 2
     assert isinstance(
-        operations[0],
+        result.operations[0],
+        EnsureUser,
+    )
+    assert isinstance(
+        result.operations[0],
         EnsureUser,
     )
 
     assert isinstance(
-        operations[1],
+        result.operations[1],
         EnsureOMVS,
     )
     
