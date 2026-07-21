@@ -81,6 +81,7 @@ def _validate_section(
                 message=f"{_format_path(path)} must be an object"
             )
         )
+        return
     allowed = set(schema.fields) | set(schema.sections)
     if strict:
         for name in data:
@@ -91,11 +92,6 @@ def _validate_section(
                         message=f"{_format_path(path + [name])} unknown field"
                     )
                 )    
-#                _add_error(
-#                    errors,
-#                    path + [name],
-#                    "unknown field",
-#                )
     #
     # Validate fields
     #
@@ -161,7 +157,6 @@ def _validate_field(
 
     elif field.type == ValueType.OBJECT:
         _validate_object(value, path, errors)
-
 
 def _validate_boolean(
     value: Any,

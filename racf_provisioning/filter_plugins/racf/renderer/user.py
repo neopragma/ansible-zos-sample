@@ -1,6 +1,7 @@
 from ..operations import (
-    EnsureOMVS,
     EnsureUser,
+    EnsureOMVS,
+    EnsureTSO
 )
 
 
@@ -22,6 +23,16 @@ def render(operation):
                 f")"
             )
         ]
+
+    elif isinstance(operation, EnsureTSO):
+
+        return [
+            (
+                f"ALTUSER {operation.userid} "
+                f"TSO(ACCTNUM({operation.acct}) "
+                f"PROC({operation.proc}))"
+            )
+         ]    
 
     raise ValueError(
         f"Unsupported operation: {operation}"

@@ -69,6 +69,10 @@ def test_user_profile_end_to_end():
                 "home": "/u/user01",
                 "program": "/bin/sh",
             },
+            "tso": {
+            "acct": "ACCT01",
+            "proc": "PROC01",
+            }
         },
     }
 
@@ -88,5 +92,6 @@ def test_user_profile_end_to_end():
     assert commands == [
         "ADDUSER USER01",
         "ALTUSER USER01 OMVS(UID(12345) HOME(/u/user01) PROGRAM(/bin/sh))",
+        "ALTUSER USER01 TSO(ACCTNUM(ACCT01) PROC(PROC01))",
     ]    
 

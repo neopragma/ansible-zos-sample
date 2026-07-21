@@ -6,33 +6,7 @@ Goal
 
 The validator is production quality.
 
-Definition of Done
-
-- Public API unchanged.
-- Existing tests pass.
-- Missing behaviors covered by tests.
-- validator.py refactored for readability.
-- Planner can begin on a stable foundation.
-
-Stories
-
-1. Expand validator test suite
-
-- cover missing behavior
-- cover regressions
-- organize by validator behavior
-
-Not assigned to sprints:
-
-Story 2.
-
-- validator.py split \_validate\_field() into
-  - \_validate\_string(), 
-  - \_validate\_integer(), 
-  - \_validate\_boolean(), 
-  - \_validate\_enum(),
-  - \_validate\_list(),
-  - \_validate\_object()
+Sprint 2
 
 Story 3.
 
