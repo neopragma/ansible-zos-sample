@@ -1,6 +1,6 @@
-from filter_plugins.racf.operations import EnsureUser
-#from filter_plugins.racf.planner.base import plan_base
-from filter_plugins.racf.planner.base import plan
+from racf.operations import EnsureUser
+#from racf.planner.base import plan_base
+from racf.planner.base import plan
 
 def test_plan_base():
 

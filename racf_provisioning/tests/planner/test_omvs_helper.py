@@ -1,5 +1,5 @@
-from filter_plugins.racf.operations import EnsureOMVS
-from filter_plugins.racf.planner.omvs import plan
+from racf.operations import EnsureOMVS
+from racf.planner.omvs import plan
 
 
 def test_plan_omvs():

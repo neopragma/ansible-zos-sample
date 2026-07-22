@@ -7,7 +7,7 @@ def load_filter_module():
     path = (
         Path(__file__).parents[2]
         / "filter_plugins"
-        / "racf.py"
+        / "racf_filters.py"
     )
 
     spec = importlib.util.spec_from_file_location(

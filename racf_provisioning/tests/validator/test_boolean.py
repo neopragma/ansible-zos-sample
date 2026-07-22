@@ -1,6 +1,6 @@
 import pytest
 
-from filter_plugins.racf.validator import validate
+from racf.validator import validate
 from tests.helpers import assert_valid, assert_invalid, assert_has_error
 
 

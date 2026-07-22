@@ -1,4 +1,4 @@
-from filter_plugins.racf.planner import (
+from racf.planner import (
     Plan,
     plan,
 )

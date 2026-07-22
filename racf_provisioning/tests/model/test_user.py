@@ -2,7 +2,7 @@
 Tests for RACF domain models.
 """
 
-from filter_plugins.racf.model import (
+from racf.model import (
     RacfUser,
     load_user,
 )

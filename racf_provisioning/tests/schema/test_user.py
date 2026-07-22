@@ -2,7 +2,7 @@
 Tests for RACF schemas.
 """
 
-from filter_plugins.racf.schema import (
+from racf.schema import (
     USER_SCHEMA,
     ValueType,
 )

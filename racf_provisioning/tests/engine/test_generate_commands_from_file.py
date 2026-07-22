@@ -1,29 +1,30 @@
-from filter_plugins.racf.engine import generate_commands
-from filter_plugins.racf.engine import generate_commands_from_file
+from racf.engine import generate_commands
+from racf.engine import generate_commands_from_file
 import pytest
 
 def test_generate_commands_from_file(tmp_path):
     filename = tmp_path / "USER01.yml"
     filename.write_text("""
-state: present
+racf_user:
+  meta:
+    object_type: user
+    schema_version: "0.1.0"
+    zos_version: "3.1.0"
 
-meta:
-  object_type: user
-  schema_version: 0.1.0
-  zos_version: 3.1.0
+  state: present
 
-content:
-  base:
-    userid: USER01
+  content:
+    base:
+      userid: USER01
 
-  omvs:
-    uid: 12345
-    home: /u/user01
-    program: /bin/sh
+    omvs:
+      uid: 12345
+      home: /u/user01
+      program: /bin/sh
 
-  tso:
-    acct: ACCT01
-    proc: PROC01    
+    tso:
+      account_number: ACCT01
+      procedure: PROC01    
 """)
 
     commands = generate_commands_from_file(str(filename))
@@ -37,24 +38,25 @@ content:
 def test_rejects_missing_userid(tmp_path):
     filename = tmp_path / "USER01.yml"
     filename.write_text("""
-state: present
+racf_user:
+  meta:
+    object_type: user
+    schema_version: "0.1.0"
+    zos_version: "3.1.0"
 
-meta:
-  object_type: user
-  schema_version: 0.1.0
-  zos_version: 3.1.0
+  state: present
 
-content:
-  base:
+  content:
+    base:
 
-  omvs:
-    uid: 12345
-    home: /u/user01
-    program: /bin/sh
+    omvs:
+      uid: 12345
+      home: /u/user01
+      program: /bin/sh
 
-  tso:
-    acct: ACCT01
-    proc: PROC01    
+    tso:
+      account_number: ACCT01
+      procedure: PROC01    
 """)
 
     with pytest.raises(ValueError) as excinfo:

@@ -1,4 +1,4 @@
-from filter_plugins.racf.engine import generate_commands
+from racf.engine import generate_commands
 import pytest
 
 def test_generate_commands_from_model():
@@ -20,8 +20,8 @@ def test_generate_commands_from_model():
                 "program": "/bin/sh",
             },
             "tso": {
-                "acct": "ACCT01",
-                "proc": "PROC01",
+                "account_number": "ACCT01",
+                "procedure": "PROC01",
              },    
         },
     }

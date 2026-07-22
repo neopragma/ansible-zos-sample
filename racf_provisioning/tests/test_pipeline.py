@@ -1,7 +1,7 @@
-from filter_plugins.racf.planner import plan
-from filter_plugins.racf.renderer import render
-from filter_plugins.racf.validator import validate
-from filter_plugins.racf.schema import USER_SCHEMA
+from racf.planner import plan
+from racf.renderer import render
+from racf.validator import validate
+from racf.schema import USER_SCHEMA
 
 def test_user_present_pipeline():
 
@@ -70,8 +70,8 @@ def test_user_profile_end_to_end():
                 "program": "/bin/sh",
             },
             "tso": {
-            "acct": "ACCT01",
-            "proc": "PROC01",
+            "account_number": "ACCT01",
+            "procedure": "PROC01",
             }
         },
     }

@@ -3,11 +3,11 @@ Tests for the generic schema validator.
 """
 
 import pytest
-from filter_plugins.racf.exceptions import (
+from racf.exceptions import (
     SchemaValidationError,
 )
-from filter_plugins.racf.schema import USER_SCHEMA
-from filter_plugins.racf.validator import validate
+from racf.schema import USER_SCHEMA
+from racf.validator import validate
 
 def test_valid_user_profile():
     data = {

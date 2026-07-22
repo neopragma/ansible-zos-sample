@@ -1,8 +1,8 @@
-from filter_plugins.racf.operations import (
+from racf.operations import (
     EnsureUser,
     EnsureTSO,
 )
-from filter_plugins.racf.renderer import render
+from racf.renderer import render
 
 def test_render_ensure_tso():
     operation = EnsureTSO(

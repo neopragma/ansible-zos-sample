@@ -1,0 +1,17 @@
+---
+- name: Generate RACF commands
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    profile: "{{ playbook_dir }}/../racf_profiles/users/USER01.yml"
+
+  tasks:
+
+    - name: Generate RACF commands
+      set_fact:
+        racf_commands: "{{ profile | racf_provision }}"
+
+    - name: Display commands
+      debug:
+        var: racf_commands

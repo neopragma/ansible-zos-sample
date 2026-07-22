@@ -1,6 +1,6 @@
 [tool.pytest.ini_options]
 addopts = [
-    "--cov=filter_plugins/racf",
+    "--cov=racf",
     "--cov-report=term-missing",
 ]
 
@@ -14,7 +14,7 @@ testpaths = [
 
 [tool.coverage.run]
 source = [
-    "filter_plugins/racf",
+    "racf",
 ]
 
 omit = [

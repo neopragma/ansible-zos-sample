@@ -1,9 +1,9 @@
-from filter_plugins.racf.operations import (
+from racf.operations import (
     EnsureOMVS,
     EnsureUser,
 )
 
-from filter_plugins.racf.planner import plan
+from racf.planner import plan
 
 def test_plan_minimal_user():
 

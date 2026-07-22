@@ -4,13 +4,13 @@ Tests for enum validation.
 
 import pytest
 
-from filter_plugins.racf.schema.common import (
+from racf.schema.common import (
     Field,
     Section,
     ValueType,
 )
 
-from filter_plugins.racf.validator import validate
+from racf.validator import validate
 
 from tests.helpers import (
     assert_valid,

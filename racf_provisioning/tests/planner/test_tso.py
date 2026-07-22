@@ -1,5 +1,5 @@
-from filter_plugins.racf.operations import EnsureTSO
-from filter_plugins.racf.planner.tso import plan
+from racf.operations import EnsureTSO
+from racf.planner.tso import plan
 
 
 def test_plan_tso_creates_ensure_tso():
@@ -10,8 +10,8 @@ def test_plan_tso_creates_ensure_tso():
                 "userid": "USER01",
             },
             "tso": {
-                "acct": "ACCT01",
-                "proc": "PROC01",
+                "account_number": "ACCT01",
+                "procedure": "PROC01",
             },
         }
     }

@@ -2,8 +2,8 @@
 Tests for required field validation.
 """
 
-from filter_plugins.racf.schema import USER_SCHEMA
-from filter_plugins.racf.validator import validate
+from racf.schema import USER_SCHEMA
+from racf.validator import validate
 
 from tests.helpers import (
     assert_valid,

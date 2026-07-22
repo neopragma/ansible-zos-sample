@@ -1,0 +1,9 @@
+from racf.engine import generate_commands_from_file
+
+
+class FilterModule:
+
+    def filters(self):
+        return {
+            "racf_provision": generate_commands_from_file,
+        }

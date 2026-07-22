@@ -1,0 +1,23 @@
+---
+racf_user:
+  meta:
+
+    object_type: user
+    schema_version: "0.1.0"
+    zos_version: "3.1.0"
+
+  state: present                     # present | absent
+
+  content:
+
+    base:
+      userid: "USER01"
+
+    omvs:
+      uid: 1000
+      home: "/u/ibmuser"
+      program: "/bin/sh"  
+
+    tso:
+      account_number: null
+      procedure: "IKJACCNT"
