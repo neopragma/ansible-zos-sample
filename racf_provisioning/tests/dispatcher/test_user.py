@@ -2,10 +2,12 @@ from racf.operations import (
     EnsureUser,
 )
 from racf.dispatcher import dispatch
+from racf.strategy import SeparateCommandsStrategy
 
-def test_render_ensure_user():
+def test_dispatch_ensure_user():
     operation = EnsureUser(userid="USER01")
 
-    assert render(operation) == [
+    assert dispatch(
+        [ operation ], SeparateCommandsStrategy())  == [
         "ADDUSER USER01",
     ]   

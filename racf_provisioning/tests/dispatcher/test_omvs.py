@@ -1,10 +1,10 @@
-from racf.operations import (
-    EnsureUser,
-    EnsureOMVS,
-)
+from racf.operations import EnsureOMVS
 from racf.dispatcher import dispatch
+from racf.strategy import SeparateCommandsStrategy
 
-def test_render_ensure_omvs():
+
+def test_dispatch_ensure_omvs():
+
     operation = EnsureOMVS(
         userid="USER01",
         uid=12345,
@@ -12,7 +12,12 @@ def test_render_ensure_omvs():
         program="/bin/sh",
     )
 
-    assert render(operation) == [
+    commands = dispatch(
+        [operation],
+        SeparateCommandsStrategy(),
+    )
+
+    assert commands == [
         "ALTUSER USER01 OMVS("
         "UID(12345) "
         "HOME(/u/user01) "

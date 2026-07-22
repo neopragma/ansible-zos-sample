@@ -12,7 +12,7 @@ def plan(model):
     return [
         EnsureTSO(
             userid=userid,
-            acct=tso["account_number"],
-            proc=tso["procedure"],
+            account_number=tso["account_number"],
+            procedure=tso["procedure"],
         )
     ]

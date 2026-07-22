@@ -21,10 +21,10 @@ def generate_commands(model, strategy=None):
             format_validation_errors(result)
         )
 
-    operations = plan(model)
+    plan_result = plan(model)
 
     return dispatch(
-        operations,
+        plan_result.operations,
         strategy,
     )
 

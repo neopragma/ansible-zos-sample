@@ -20,7 +20,7 @@ def test_plan_tso_creates_ensure_tso():
     assert result == [
         EnsureTSO(
             userid="USER01",
-            acct="ACCT01",
-            proc="PROC01",
+            account_number="ACCT01",
+            procedure="PROC01",
         )
     ]
