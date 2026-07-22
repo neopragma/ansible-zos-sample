@@ -1,0 +1,49 @@
+"""
+Top-level RACF renderer.
+
+Converts planned RACF operations into RACF command strings.
+"""
+
+from enum import Enum
+
+from .user import render_user
+
+
+class RenderStrategy(str, Enum):
+    """
+    Controls how RACF commands are emitted.
+    """
+
+    COMBINED = "combined"
+    SEPARATE = "separate"
+
+
+def render(operation, strategy=RenderStrategy.SEPARATE):
+    """
+    Render a RACF operation.
+
+    Args:
+        operation:
+            Planned RACF operation.
+
+        strategy:
+            Command generation strategy.
+
+    Returns:
+        list[str]: RACF commands
+    """
+
+    if isinstance(strategy, str):
+        strategy = RenderStrategy(strategy)
+
+    operation_type = operation["type"]
+
+    if operation_type == "user":
+        return render_user(
+            operation,
+            strategy
+        )
+
+    raise ValueError(
+        f"Unsupported RACF operation type: {operation_type}"
+    )

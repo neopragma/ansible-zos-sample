@@ -1,33 +1,40 @@
-from racf.planner import plan
-from racf.renderer import render
+from racf.engine import generate_commands
 from racf.validator import validate
 from racf.schema import USER_SCHEMA
+
 
 def test_user_present_pipeline():
 
     model = {
+        "state": "present",
+        "meta": {
+            "object_type": "user",
+            "schema_version": "0.1.0",
+            "zos_version": "3.1.0",
+        },
         "content": {
             "base": {
                 "userid": "USER01",
             }
-        }
+        },
     }
-    
-    commands = []
 
-    plan_result = plan(model)
-    for operation in plan_result.operations:
-        commands.extend(
-            render(operation)
-        )
+    commands = generate_commands(model)
 
     assert commands == [
         "ADDUSER USER01",
     ]
 
+
 def test_user_with_omvs_present_pipeline():
 
     model = {
+        "state": "present",
+        "meta": {
+            "object_type": "user",
+            "schema_version": "0.1.0",
+            "zos_version": "3.1.0",
+        },
         "content": {
             "base": {
                 "userid": "USER01",
@@ -37,23 +44,20 @@ def test_user_with_omvs_present_pipeline():
                 "home": "/u/user01",
                 "program": "/bin/sh",
             },
-        }
+        },
     }
-    
-    commands = []
-    plan_result = plan(model)
-    for operation in plan_result.operations:
-        commands.extend(
-            render(operation)
-        )
+
+    commands = generate_commands(model)
+
     assert commands == [
         "ADDUSER USER01",
         "ALTUSER USER01 OMVS(UID(12345) HOME(/u/user01) PROGRAM(/bin/sh))",
-    ]  
+    ]
+
 
 def test_user_profile_end_to_end():
 
-    document = {
+    model = {
         "state": "present",
         "meta": {
             "object_type": "user",
@@ -70,28 +74,16 @@ def test_user_profile_end_to_end():
                 "program": "/bin/sh",
             },
             "tso": {
-            "account_number": "ACCT01",
-            "procedure": "PROC01",
-            }
+                "account_number": "ACCT01",
+                "procedure": "PROC01",
+            },
         },
     }
 
-    result = validate(
-        document,
-        USER_SCHEMA,
-    )
+    commands = generate_commands(model)
 
-    assert result.valid is True
-    operations = plan(document)
-    commands = []
-    plan_result = plan(document)
-    for operation in plan_result.operations:
-        commands.extend(
-            render(operation)
-        )
     assert commands == [
         "ADDUSER USER01",
         "ALTUSER USER01 OMVS(UID(12345) HOME(/u/user01) PROGRAM(/bin/sh))",
         "ALTUSER USER01 TSO(ACCTNUM(ACCT01) PROC(PROC01))",
-    ]    
-
+    ]

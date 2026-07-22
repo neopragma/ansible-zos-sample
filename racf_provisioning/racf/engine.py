@@ -1,14 +1,18 @@
-from pathlib import Path
-import yaml
 from .schema import USER_SCHEMA
 from .validator import validate
 from .planner import plan
-from .renderer import render
+from .dispatcher import dispatch
 from .loader import load_yaml, extract_profile
+from .strategy import SeparateCommandsStrategy
 
-def generate_commands(document):
+
+def generate_commands(model, strategy=None):
+
+    if strategy is None:
+        strategy = SeparateCommandsStrategy()
+
     result = validate(
-        document,
+        model,
         USER_SCHEMA,
     )
 
@@ -17,23 +21,23 @@ def generate_commands(document):
             format_validation_errors(result)
         )
 
-    plan_result = plan(document)
+    operations = plan(model)
 
-    commands = []
-
-    for operation in plan_result.operations:
-        commands.extend(
-            render(operation)
-        )
-
-    return commands
+    return dispatch(
+        operations,
+        strategy,
+    )
 
 def generate_commands_from_file(filename):
+
     document = load_yaml(filename)
     model = extract_profile(document)
+
     return generate_commands(model)
 
+
 def format_validation_errors(result):
+
     return "\n".join(
         f"{error.path}: {error.message}"
         for error in result.errors

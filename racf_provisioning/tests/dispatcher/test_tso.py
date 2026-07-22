@@ -2,7 +2,7 @@ from racf.operations import (
     EnsureUser,
     EnsureTSO,
 )
-from racf.renderer import render
+from racf.dispatcher import dispatch
 
 def test_render_ensure_tso():
     operation = EnsureTSO(

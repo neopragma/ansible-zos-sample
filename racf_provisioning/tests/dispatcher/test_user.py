@@ -1,7 +1,7 @@
 from racf.operations import (
     EnsureUser,
 )
-from racf.renderer import render
+from racf.dispatcher import dispatch
 
 def test_render_ensure_user():
     operation = EnsureUser(userid="USER01")
