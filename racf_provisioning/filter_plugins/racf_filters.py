@@ -7,12 +7,18 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
+import racf.engine as engine
 
-from racf.engine import generate_commands_from_file
-
-def racf_provision(filename):
+def racf_provision(path):
     try:
-        return generate_commands_from_file(filename)
+        p = Path(path)
+
+        if p.is_file():
+            return engine.generate_commands_from_file(p)
+
+        if p.is_dir():
+            return engine.generate_commands_from_directory(p)
+
     except Exception as exc:
         raise RuntimeError(format_exc()) from exc
 

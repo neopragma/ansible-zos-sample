@@ -11,11 +11,11 @@ racf_user:
   content:
 
     base:
-      userid: "USER01"
+      userid: "USER02"
 
     omvs:
       uid: 1000
-      home: "/u/user01"
+      home: "/u/user02"
       program: "/bin/sh"  
 
     tso:

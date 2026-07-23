@@ -2,6 +2,37 @@ Parking Lot
 
 1. Architectural improvement.
 
+One thing I'd eventually like to eliminate is the dispatcher's if isinstance(...) chain.
+
+Instead of
+
+if isinstance(op, EnsureUser):
+    ...
+elif isinstance(op, EnsureOMVS):
+    ...
+
+I'd register handlers.
+
+Something like
+
+_dispatchers = {}
+
+and
+
+register\_dispatcher(EnsureUser, dispatch\_user)
+register\_dispatcher(EnsureOMVS, dispatch\_omvs)
+register\_dispatcher(EnsureTSO, dispatch\_tso)
+
+Then
+
+handler = _dispatchers[type(operation)]
+return strategy.dispatch(handler(operation))
+
+Adding a new RACF object then requires no edits to existing code.
+
+
+2. Architectural improvement.
+
 Right now the pipeline is
 
 YAML
@@ -39,7 +70,7 @@ strategy
 where load\_yaml() returns a UserModel dataclass instead of a dictionary. Then everything after validation works with typed objects instead of nested dicts and string keys like "base" and "omvs". That would eliminate an entire class of bugs caused by typos in dictionary keys.
 
 
-2. Organizations will probably not want to specify profiles individually by hand. It's more likely they will have similar security profiles for people who work in particular roles and/or work with particular software product lines or related groups of applications. For example, they may have a common security profile for software developers who work on Asset Management applications, and one for software testers who work on Loan Origination, and one for system programmers who administer production LPARs, etc. 
+3. Organizations will probably not want to specify profiles individually by hand. It's more likely they will have similar security profiles for people who work in particular roles and/or work with particular software product lines or related groups of applications. For example, they may have a common security profile for software developers who work on Asset Management applications, and one for software testers who work on Loan Origination, and one for system programmers who administer production LPARs, etc. 
 
 In many cases, the only data item that would be different for profiles within the same category is the userid. All other security-related values would be the same for all userids in a given category. 
 
@@ -55,4 +86,4 @@ The organization will want to tell us the userids that belong in each applicatio
 
 To support that, we may want to implement templates that can be copied and modified programmatically to produce numerous yaml files that define various RACF elements like users, groups, and resources. Alternatively, we could change the functionality so that it needs only one yaml file but outputs many RACF commands with different userids having the same attributes as the one example.
 
-3. In many cases, userids in certain categories always have UPDATE authority on datasets whose high-level qualifiers match their TSO userids. Consider implementing an option to set this as a default behavior when creating userids for a given category (or given categories) of users. That is, when such a userid is processed with state: "present", the tool automatically generates a database resource command and a PERMIT command. Then it would be unnecessary to specify these separately. This does not apply to all userids (and it may not be the policy in a given organization), so there needs to be an appropriate way to manage it as an optional setting. 
+4. In many cases, userids in certain categories always have UPDATE authority on datasets whose high-level qualifiers match their TSO userids. Consider implementing an option to set this as a default behavior when creating userids for a given category (or given categories) of users. That is, when such a userid is processed with state: "present", the tool automatically generates a database resource command and a PERMIT command. Then it would be unnecessary to specify these separately. This does not apply to all userids (and it may not be the policy in a given organization), so there needs to be an appropriate way to manage it as an optional setting. 
