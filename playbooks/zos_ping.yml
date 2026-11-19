@@ -1,4 +1,6 @@
 ---
+# This playbook is used to ping a z/OS node to check connectivity.
+
 - name: Ping z/OS node
   hosts: zos
   gather_facts: false

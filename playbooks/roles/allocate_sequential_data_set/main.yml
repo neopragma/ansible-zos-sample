@@ -1,0 +1,12 @@
+---
+- name: Allocate sequential data set
+  ibm.ibm_zos_core.zos_data_set:
+    name: "{{ filename }}"
+    type: seq
+    space_primary: "{{ primary_allocation }}"
+    space_secondary: "{{ secondary_allocation }}"
+    space_type: trk
+    record_format: fb
+    record_length: 80
+    block_size: 32000
+    state: present
