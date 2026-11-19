@@ -1,0 +1,34 @@
+---
+- name: Allocate two sequential data sets
+
+  hosts: zos
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  vars:
+    data_sets:
+      - filename: IBMUSER.SAMP.SEQ1
+        primary_allocation: 2
+        secondary_allocation: 4
+      - filename: IBMUSER.SAMP.SEQ2
+        primary_allocation: 5
+        secondary_allocation: 5
+
+  tasks:
+    - name: Allocate data sets
+      ibm.ibm_zos_core.zos_data_set: 
+        name: "{{ item.filename }}" 
+        type: seq
+        space_primary: "{{ item.primary_allocation }}"
+        space_secondary: "{{ item.secondary_allocation }}"
+        space_type: trk
+        record_format: fb
+        record_length: 80
+        block_size: 32000
+        state: present
+      register: result
+      vars:
+        data_set: "{{ item }}"
+      loop: "{{ data_sets }}"
+      loop_control:
+        label: "{{ item.filename }}"

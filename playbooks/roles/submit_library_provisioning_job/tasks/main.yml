@@ -16,8 +16,9 @@
 
 - name: Set temporary JCL paths
   ansible.builtin.set_fact:
+    jcl_dataset_name: "MYHLQ.TMP.{{ (ansible_user | default('USER') | upper)[:4] }}{{ lookup('password', '/dev/null length=4 chars=ascii_uppercase,digits') }}"
     jcl_path: "{{ playbook_dir }}/tmp_jcl/rendered.jcl"
-    jcl_dataset_name: "{{ job_owner }}.TEMP.JCL"
+  #  jcl_dataset_name: "{{ job_owner }}.TEMP.JCL"
 
 - name: Render JCL on the control node
   ansible.builtin.template:
@@ -42,15 +43,32 @@
     space_secondary: 1
     space_type: trk
 
+- name: Check rendered JCL exists in the execution environment
+  ansible.builtin.stat:
+    path: "{{ jcl_path }}"
+  delegate_to: localhost
+  register: jcl_file
+
+- name: Confirm JCL file exists
+  ansible.builtin.assert:
+    that:
+      - jcl_file.stat.exists
+      - jcl_file.stat.isreg
+
 - name: Copy rendered JCL to temporary dataset
   ibm.ibm_zos_core.zos_copy:
     src: "{{ jcl_path }}"
     dest: "{{ jcl_dataset_name }}"
     remote_src: false
+    encoding:
+      from: UTF-8
+      to: IBM-037
+
 
 - name: Submit JCL
   ibm.ibm_zos_core.zos_job_submit:
     src: "{{ jcl_dataset_name }}"
+    wait: true
     wait_time_s: 30
   register: job_result
 

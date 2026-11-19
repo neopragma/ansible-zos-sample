@@ -1,0 +1,20 @@
+---
+- name: Render and display a template locally
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Render the template to a local file
+      ansible.builtin.template:
+        src: hello2_wrong.j2
+        dest: /tmp/rendered-message.txt
+
+    - name: Read the rendered file
+      ansible.builtin.command: cat /tmp/rendered-message.txt
+      register: rendered_output
+      changed_when: false
+
+    - name: Display the rendered content
+      ansible.builtin.debug:
+        var: rendered_output.stdout

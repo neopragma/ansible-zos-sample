@@ -1,0 +1,6 @@
+{# Say hello to a friend #}
+{% if spanish %}
+¡Hola, {{ my_friend | default('amiga o amigo') }}!
+{% else %}
+Hello, {{ my_friend | default('friend') }}!
+{% endif %}

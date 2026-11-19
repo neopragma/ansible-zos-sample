@@ -19,7 +19,7 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    job_owner: "{{ owner | default(IBMUSER) }}" 
+    job_owner: "{{ owner | default('IBMUSER') }}" 
     hlq: "{{ userid }}"
     jcl_path: "{{ playbook_dir }}/tmp_jcl/rendered.jcl"
     jcl_dataset_name: "{{ job_owner }}.TMPJCL.{{ inventory_hostname | upper }}"

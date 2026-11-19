@@ -1,0 +1,8 @@
+{# Say hello to a friend #}
+{% set greetings = {
+  'es': "¡Hola, {{ my_friend | default('amiga o amiga')! }}",
+  'fr': 'Bonjour!', {{ my_friend | default('ami(e)')! }}",
+  'en': "Hello, {{ my_friend | default('friend')! }}"
+}
+%}
+{{ greetings.get(lang, "Hello, friend!") }}
