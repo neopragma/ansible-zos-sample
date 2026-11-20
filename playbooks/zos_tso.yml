@@ -15,8 +15,6 @@
         commands:
           - "listuser {{ racf_userid }}"
       register: result
-      ignore_errors: true 
-      when: result.output[0].failed
 
     - debug:
         var: result
