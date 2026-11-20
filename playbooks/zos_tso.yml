@@ -13,7 +13,7 @@
     - name: Submit TSO commands
       zos_tso_command:
         commands:
-          - "listuser {{ racf_userid }}"
+          - "listuser {{ racf_userid }} tso omvs"
       register: result
 
     - debug:
