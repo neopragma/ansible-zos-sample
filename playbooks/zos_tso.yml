@@ -1,0 +1,23 @@
+# Sample playbook to submit TSO commands   
+- name: TSO Command Example
+  hosts: zoslab
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  environment: "{{ environment_vars }}"
+
+  vars:
+    racf_userid: 'DUSR01 '
+
+  tasks:
+    - name: Submit TSO commands
+      zos_tso_command:
+        commands:
+          - "listuser {{ racf_userid }}"
+      register: result
+      ignore_errors: true 
+      when: result.output[0].failed
+
+    - debug:
+        var: result
+
